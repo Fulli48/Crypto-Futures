@@ -1,4 +1,4 @@
-name: ChatGPT Patch Processor
+﻿name: ChatGPT Patch Processor
 
 on:
   issues:
@@ -76,7 +76,10 @@ jobs:
         shell: bash
         run: |
           set -e
+<<<<<<< HEAD
           # FIX: set committer identity globally so commits work
+=======
+>>>>>>> dfc8143 (Replace workflow: clean dev, safe temp files, identity set; robust PR step (skip when no diffs))
           git config --global user.name  "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
@@ -115,7 +118,11 @@ jobs:
       - name: Ensure PR dev -> main exists (REST create or update)
         shell: bash
         env:
+<<<<<<< HEAD
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # if you added GH_PAT earlier, keep GH_TOKEN:${{ secrets.GH_PAT }}
+=======
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # use ${{ secrets.GH_PAT }} if you created a PAT
+>>>>>>> dfc8143 (Replace workflow: clean dev, safe temp files, identity set; robust PR step (skip when no diffs))
         run: |
           set -euo pipefail
 
@@ -124,6 +131,7 @@ jobs:
           TITLE="ChatGPT Patch from Issue #${{ github.event.issue.number }}"
           BODY="Automated PR created from a [CHATGPT PATCH] in issue #${{ github.event.issue.number }}."
 
+<<<<<<< HEAD
           # Make sure we know if dev is ahead of main
           git fetch origin main dev || git fetch origin
           AHEAD="$(git rev-list --left-right --count origin/main...dev | awk '{print $2}')"
@@ -145,3 +153,47 @@ jobs:
             echo "Created PR dev -> main"
           fi
 
+=======
+          echo "Fetching main/dev to compare ahead/behind…"
+          git fetch origin main dev || git fetch origin
+
+          AHEAD="$(git rev-list --left-right --count origin/main...dev | awk '{print $2}')" || AHEAD=0
+          echo "dev ahead of main by ${AHEAD:-0} commits"
+
+          if [ "${AHEAD:-0}" = "0" ]; then
+            echo "Nothing to PR (dev == main). Skipping PR creation."
+            exit 0
+          fi
+
+          echo "Looking for existing PR dev -> main…"
+          PR_NUMBER="$(gh api "/repos/${OWNER_REPO}/pulls?head=${OWNER}:dev&base=main&state=all" -q '.[0].number' || true)"
+
+          if [[ -n "$PR_NUMBER" && "$PR_NUMBER" != "null" ]]; then
+            echo "Updating existing PR #$PR_NUMBER"
+            gh api -X PATCH "/repos/${OWNER_REPO}/pulls/${PR_NUMBER}" \
+              -f state=open -f title="$TITLE" -f body="$BODY" >/dev/null
+            exit 0
+          fi
+
+          echo "Creating new PR dev -> main…"
+          set +e
+          gh api -X POST "/repos/${OWNER_REPO}/pulls" \
+            -f title="$TITLE" -f head="dev" -f base="main" -f body="$BODY" >/dev/null
+          STATUS=$?
+          set -e
+
+          if [ $STATUS -ne 0 ]; then
+            echo "Create failed; checking if a PR already exists (race/422)…"
+            PR_NUMBER="$(gh api "/repos/${OWNER_REPO}/pulls?head=${OWNER}:dev&base=main&state=all" -q '.[0].number' || true)"
+            if [[ -n "$PR_NUMBER" && "$PR_NUMBER" != "null" ]]; then
+              echo "PR already existed (#$PR_NUMBER). Updating title/body."
+              gh api -X PATCH "/repos/${OWNER_REPO}/pulls/${PR_NUMBER}" \
+                -f state=open -f title="$TITLE" -f body="$BODY" >/dev/null
+              exit 0
+            fi
+            echo "PR creation really failed."
+            exit 1
+          fi
+
+          echo "Created PR dev -> main."
+>>>>>>> dfc8143 (Replace workflow: clean dev, safe temp files, identity set; robust PR step (skip when no diffs))
