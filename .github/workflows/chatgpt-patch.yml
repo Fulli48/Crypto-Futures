@@ -34,37 +34,28 @@ jobs:
           set -euo pipefail
           BODY_FILE="$RUNNER_TEMP/body.txt"
           PATCH_FILE="$RUNNER_TEMP/chatgpt.patch"
-
           jq -r '.issue.body // .comment.body // empty' "$GITHUB_EVENT_PATH" > "$BODY_FILE"
 
           echo "---- BEGIN RAW BODY (first 40 lines) ----"
           head -n 40 "$BODY_FILE" || true
           echo "---- END RAW BODY ----"
 
-          # Accept [CHATGPT PATCH] either on its own line BEFORE the fence,
-          # or INSIDE the fenced block (we'll ignore the marker line).
           awk '
             BEGIN { inblk=0; has=0; n=0; after=0 }
-            # fence line
             /^```/ {
               if (!inblk) { inblk=1; has=0; n=0; next }
-              else {
-                if (inblk && has) { for (i=1;i<=n;i++) print buf[i]; exit }
-                inblk=0; next
-              }
+              else { if (inblk && has) { for (i=1;i<=n;i++) print buf[i]; exit } ; inblk=0; next }
             }
             {
               if (inblk) {
-                if ($0 ~ /\[CHATGPT PATCH\]/) { has=1; next }   # ignore marker line inside fence
+                if ($0 ~ /\[CHATGPT PATCH\]/) { has=1; next }
                 buf[++n]=$0
               } else {
-                if ($0 ~ /\[CHATGPT PATCH\]/) { after=1 }       # header BEFORE fence
+                if ($0 ~ /\[CHATGPT PATCH\]/) { after=1 }
                 else if (after && /^```/) { inblk=1; has=1; n=0; after=0; next }
               }
             }
-            END {
-              if (inblk && has) { for (i=1;i<=n;i++) print buf[i] }
-            }
+            END { if (inblk && has) { for (i=1;i<=n;i++) print buf[i] } }
           ' "$BODY_FILE" > "$PATCH_FILE"
 
           echo "---- BEGIN EXTRACTED PATCH (first 60 lines) ----"
@@ -75,7 +66,6 @@ jobs:
             echo "ERROR: No valid patch content found near [CHATGPT PATCH]." >&2
             exit 1
           fi
-
           echo "patch_file=$PATCH_FILE" >> "$GITHUB_OUTPUT"
 
       - name: Create/refresh dev branch (clean)
@@ -101,11 +91,9 @@ jobs:
           set -e
           git config --global user.name  "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
           git rebase --abort || true
           git cherry-pick --abort || true
           git am --abort || true
-
           PATCH="${{ steps.extract.outputs.patch_file }}"
 
           if git apply --3way --ignore-space-change --whitespace=fix "$PATCH"; then
@@ -156,16 +144,31 @@ jobs:
           PR_NUMBER="$(gh pr list --head dev --base main --state all --json number -q '.[0].number' || true)"
           echo "Existing PR number: ${PR_NUMBER:-<none>}"
           if [[ -n "$PR_NUMBER" && "$PR_NUMBER" != "null" ]]; then
-            STATE="$(gh pr view "$PR_NUMBER" --json state -q .state 2>/dev/null || echo unknown)"
+            STATE="$(gh pr view "$PR_NUMBER" --json state -q .state 2>/dev/null | tr '[:upper:]' '[:lower:]' || echo unknown)"
             echo "Existing PR state: $STATE"
-            if [ "$STATE" != "open" ]; then
-              echo "Reopening PR #$PR_NUMBER via issues API…"
-              gh api -X PATCH "/repos/${OWNER_REPO}/issues/${PR_NUMBER}" -f state=open >/dev/null
-            fi
-            echo "Updating PR #$PR_NUMBER title/body…"
-            gh api -X PATCH "/repos/${OWNER_REPO}/pulls/${PR_NUMBER}" -f title="$TITLE" -f body="$BODY" >/dev/null
-            echo "PR #$PR_NUMBER updated."
-            exit 0
+            case "$STATE" in
+              open)
+                echo "Updating PR #$PR_NUMBER title/body…"
+                gh api -X PATCH "/repos/${OWNER_REPO}/pulls/${PR_NUMBER}" -f title="$TITLE" -f body="$BODY" >/dev/null
+                echo "PR #$PR_NUMBER updated."
+                exit 0
+                ;;
+              closed)
+                echo "Reopening PR #$PR_NUMBER via issues API…"
+                gh api -X PATCH "/repos/${OWNER_REPO}/issues/${PR_NUMBER}" -f state=open >/dev/null
+                gh api -X PATCH "/repos/${OWNER_REPO}/pulls/${PR_NUMBER}" -f title="$TITLE" -f body="$BODY" >/dev/null
+                echo "PR #$PR_NUMBER reopened and updated."
+                exit 0
+                ;;
+              merged)
+                echo "Previous PR is merged; will create a new PR."
+                PR_NUMBER=""   # fall through to creation
+                ;;
+              *)
+                echo "Unknown PR state; attempting new PR create."
+                PR_NUMBER=""
+                ;;
+            esac
           fi
 
           echo "Creating new PR dev -> main…"
