@@ -1,4 +1,3 @@
-@'
 name: ChatGPT Patch Processor
 
 on:
@@ -127,4 +126,4 @@ __RAW_BODY__
           else
             gh pr create --head dev --base main --title "$TITLE" --body "$BODY"
           fi
-'@ | Set-Content -Path ".github/workflows/chatgpt-patch.yml" -Encoding UTF8
+
