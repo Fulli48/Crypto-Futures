@@ -37,31 +37,33 @@ jobs:
 
           jq -r '.issue.body // .comment.body // empty' "$GITHUB_EVENT_PATH" > "$BODY_FILE"
 
-          # Extract rules:
-          # 1) If [CHATGPT PATCH] appears BEFORE a code fence, capture the next fenced block.
-          # 2) If [CHATGPT PATCH] appears INSIDE a fenced block, capture that same block,
-          #    excluding the marker line itself.
+          echo "---- BEGIN RAW BODY (first 40 lines) ----"
+          head -n 40 "$BODY_FILE" || true
+          echo "---- END RAW BODY ----"
+
+          # Accept [CHATGPT PATCH] either on its own line BEFORE the fence,
+          # or INSIDE the fenced block (we'll ignore the marker line).
           awk '
-            BEGIN { in=0; has=0; n=0; after=0 }
+            BEGIN { inblk=0; has=0; n=0; after=0 }
             # fence line
             /^```/ {
-              if (!in) { in=1; has=0; n=0; next }
+              if (!inblk) { inblk=1; has=0; n=0; next }
               else {
-                if (in && has) { for (i=1;i<=n;i++) print buf[i]; exit }
-                in=0; next
+                if (inblk && has) { for (i=1;i<=n;i++) print buf[i]; exit }
+                inblk=0; next
               }
             }
             {
-              if (in) {
-                if (index($0, "[CHATGPT PATCH]")) { has=1; next }   # ignore marker line
+              if (inblk) {
+                if ($0 ~ /\[CHATGPT PATCH\]/) { has=1; next }   # ignore marker line inside fence
                 buf[++n]=$0
               } else {
-                if (index($0, "[CHATGPT PATCH]")) { after=1 }       # header BEFORE fence
-                else if (after && /^```/) { in=1; has=1; n=0; after=0; next }
+                if ($0 ~ /\[CHATGPT PATCH\]/) { after=1 }       # header BEFORE fence
+                else if (after && /^```/) { inblk=1; has=1; n=0; after=0; next }
               }
             }
             END {
-              if (in && has) { for (i=1;i<=n;i++) print buf[i] }
+              if (inblk && has) { for (i=1;i<=n;i++) print buf[i] }
             }
           ' "$BODY_FILE" > "$PATCH_FILE"
 
