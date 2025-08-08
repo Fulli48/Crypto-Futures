@@ -26,6 +26,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Use runner temp, never the repo dir
           BODY_FILE="$RUNNER_TEMP/body.txt"
           PATCH_FILE="$RUNNER_TEMP/chatgpt.patch"
 
@@ -55,23 +56,41 @@ jobs:
 
           echo "patch_file=$PATCH_FILE" >> "$GITHUB_OUTPUT"
 
-      - name: Create/refresh dev branch locally
+      - name: Create/refresh dev branch (clean)
         shell: bash
         run: |
           set -e
+          # Remove any stray temp files that might exist in repo from old runs
+          rm -f body.txt chatgpt.patch || true
+
+          # Ensure we start from latest main, no rebase state
+          git rebase --abort || true
+          git cherry-pick --abort || true
+          git am --abort || true
+
+          git fetch origin --prune
+
+          # Create dev if missing; otherwise check it out
           if git ls-remote --exit-code --heads origin dev >/dev/null 2>&1; then
-            git fetch origin dev:dev
-            git checkout dev
-            git fetch origin main
-            git rebase origin/main || true
+            git checkout -B dev origin/dev
           else
             git checkout -B dev origin/main || git checkout -B dev main
           fi
 
-      - name: Try applying patch (3-way, tolerant)
+          # Hard reset dev to latest main to avoid lingering rebase/cherry-pick state
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Apply patch and commit (3-way, tolerant)
         shell: bash
         run: |
           set -e
+
+          # Make sure no rebase/cherry-pick state is active
+          git rebase --abort || true
+          git cherry-pick --abort || true
+          git am --abort || true
+
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           PATCH="${{ steps.extract.outputs.patch_file }}"
@@ -89,10 +108,9 @@ jobs:
             fi
           fi
 
-          # Do NOT add temp files from $RUNNER_TEMP
+          # Commit only repo changes (no temp files; they live in $RUNNER_TEMP anyway)
           if ! git diff --quiet || ! git diff --cached --quiet; then
             git add -A
-            git reset -- ':!**/body.txt' ':!**/chatgpt.patch' || true
             git commit -m "Apply ChatGPT patch from issue #${{ github.event.issue.number }}"
           else
             echo "No changes after applying patch."
@@ -122,9 +140,6 @@ jobs:
               -f state=open -f title="$TITLE" -f body="$BODY" >/dev/null
             echo "Updated PR #$PR_NUMBER"
           else
-            gh api -X POST "/repos/${OWNER_REPO}/pulls" \
-              -f title="$TITLE" -f head="dev" -f base="main" -f body="$BODY" >/devnull || true
-            # Use proper redirection (fix typo if needed)
             gh api -X POST "/repos/${OWNER_REPO}/pulls" \
               -f title="$TITLE" -f head="dev" -f base="main" -f body="$BODY" >/dev/null
             echo "Created new PR from dev -> main"
