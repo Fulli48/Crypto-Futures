@@ -115,14 +115,24 @@ jobs:
       - name: Ensure PR dev -> main exists (REST create or update)
         shell: bash
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}   # ← use your PAT instead of GITHUB_TOKEN
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # if you added GH_PAT earlier, keep GH_TOKEN:${{ secrets.GH_PAT }}
         run: |
           set -euo pipefail
+
           OWNER_REPO="${GITHUB_REPOSITORY}"
           OWNER="${OWNER_REPO%%/*}"
           TITLE="ChatGPT Patch from Issue #${{ github.event.issue.number }}"
           BODY="Automated PR created from a [CHATGPT PATCH] in issue #${{ github.event.issue.number }}."
 
+          # Make sure we know if dev is ahead of main
+          git fetch origin main dev || git fetch origin
+          AHEAD="$(git rev-list --left-right --count origin/main...dev | awk '{print $2}')"
+          if [ "${AHEAD:-0}" = "0" ]; then
+            echo "dev is not ahead of main; nothing to open/update. Skipping PR step."
+            exit 0
+          fi
+
+          # Find existing PR dev -> main (any state)
           PR_NUMBER="$(gh api "/repos/${OWNER_REPO}/pulls?head=${OWNER}:dev&base=main&state=all" -q '.[0].number' || true)"
 
           if [[ -n "$PR_NUMBER" && "$PR_NUMBER" != "null" ]]; then
@@ -134,3 +144,4 @@ jobs:
               -f title="$TITLE" -f head="dev" -f base="main" -f body="$BODY" >/dev/null
             echo "Created PR dev -> main"
           fi
+
