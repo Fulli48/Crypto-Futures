@@ -115,7 +115,7 @@ jobs:
       - name: Ensure PR dev -> main exists (REST create or update)
         shell: bash
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}   # ← use your PAT instead of GITHUB_TOKEN
         run: |
           set -euo pipefail
           OWNER_REPO="${GITHUB_REPOSITORY}"
@@ -123,7 +123,6 @@ jobs:
           TITLE="ChatGPT Patch from Issue #${{ github.event.issue.number }}"
           BODY="Automated PR created from a [CHATGPT PATCH] in issue #${{ github.event.issue.number }}."
 
-          # Look for an existing PR from dev -> main (any state)
           PR_NUMBER="$(gh api "/repos/${OWNER_REPO}/pulls?head=${OWNER}:dev&base=main&state=all" -q '.[0].number' || true)"
 
           if [[ -n "$PR_NUMBER" && "$PR_NUMBER" != "null" ]]; then
