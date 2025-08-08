@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   apply-patch:
+    # Run when either the issue body or the comment body contains the trigger text
     if: contains(github.event.issue.body, '[CHATGPT PATCH]') || contains(github.event.comment.body, '[CHATGPT PATCH]')
     runs-on: ubuntu-latest
 
@@ -21,13 +22,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract patch from issue/comment body
+      - name: Extract patch from issue/comment body (safe)
         id: extract
         shell: bash
         run: |
+          set -euo pipefail
           BODY_FILE=body.txt
           PATCH_FILE=chatgpt.patch
-          printf "%s" "${{ github.event.issue.body || github.event.comment.body }}" > "$BODY_FILE"
+
+          # Write the raw body safely. Single-quoted heredoc prevents any shell expansion
+          # so backticks in the Markdown code fence are not executed.
+          cat > "$BODY_FILE" <<'__RAW_BODY__'
+${{ github.event.issue.body || github.event.comment.body }}
+__RAW_BODY__
+
+          echo "---- BEGIN RAW BODY (first 40 lines) ----"
+          head -n 40 "$BODY_FILE" || true
+          echo "---- END RAW BODY ----"
+
+          # Extract the FIRST fenced code block AFTER the [CHATGPT PATCH] marker
           awk '
             BEGIN { seen_hdr=0; in_block=0 }
             /\[CHATGPT PATCH\]/ { seen_hdr=1; next }
@@ -36,15 +49,22 @@ jobs:
             }
             seen_hdr && in_block { print }
           ' "$BODY_FILE" > "$PATCH_FILE"
+
+          echo "---- BEGIN EXTRACTED PATCH (first 80 lines) ----"
+          head -n 80 "$PATCH_FILE" || true
+          echo "---- END EXTRACTED PATCH ----"
+
           if [ ! -s "$PATCH_FILE" ]; then
             echo "ERROR: No fenced patch block found after [CHATGPT PATCH]." >&2
             exit 1
           fi
+
           echo "patch_file=$PATCH_FILE" >> "$GITHUB_OUTPUT"
 
       - name: Create/refresh dev branch locally
         shell: bash
         run: |
+          set -e
           if git ls-remote --exit-code --heads origin dev >/dev/null 2>&1; then
             git fetch origin dev:dev
             git checkout dev
@@ -61,6 +81,7 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           PATCH="${{ steps.extract.outputs.patch_file }}"
+
           if git apply --3way --ignore-space-change --whitespace=fix "$PATCH"; then
             echo "Applied with git apply."
           else
@@ -73,6 +94,8 @@ jobs:
               exit 1
             fi
           fi
+
+          # Commit if there are changes
           if ! git diff --quiet || ! git diff --cached --quiet; then
             git add -A
             git commit -m "Apply ChatGPT patch from issue #${{ github.event.issue.number }}"
@@ -83,6 +106,7 @@ jobs:
       - name: Push dev branch
         shell: bash
         run: |
+          set -e
           git push --force-with-lease origin dev
 
       - name: Ensure PR dev -> main exists (create or update)
@@ -94,6 +118,7 @@ jobs:
           PR_NUMBER="$(gh pr list --head dev --base main --state all --json number --jq '.[0].number')"
           TITLE="ChatGPT Patch from Issue #${{ github.event.issue.number }}"
           BODY=$'This pull request was automatically created from a [CHATGPT PATCH] submission.\n\n- Source issue: #${{ github.event.issue.number }}'
+
           if [ -n "$PR_NUMBER" ]; then
             gh pr reopen "$PR_NUMBER" || true
             gh pr edit "$PR_NUMBER" --title "$TITLE" --body "$BODY"
