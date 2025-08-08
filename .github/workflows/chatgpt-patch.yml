@@ -1,4 +1,4 @@
-﻿name: ChatGPT Patch Processor
+name: ChatGPT Patch Processor
 
 on:
   issues:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   apply-patch:
-    if: contains(github.event.issue.body || github.event.comment.body, '[CHATGPT PATCH]')
+    if: contains(github.event.issue.body, '[CHATGPT PATCH]') || contains(github.event.comment.body, '[CHATGPT PATCH]')
     runs-on: ubuntu-latest
 
     steps:
