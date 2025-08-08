@@ -12,7 +12,6 @@ permissions:
 
 jobs:
   apply-patch:
-    # Run when either the issue body or the comment body contains the trigger text
     if: contains(github.event.issue.body, '[CHATGPT PATCH]') || contains(github.event.comment.body, '[CHATGPT PATCH]')
     runs-on: ubuntu-latest
 
@@ -22,7 +21,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract patch from issue/comment body (safe)
+      - name: Extract patch from issue/comment body (via event JSON)
         id: extract
         shell: bash
         run: |
@@ -30,23 +29,18 @@ jobs:
           BODY_FILE=body.txt
           PATCH_FILE=chatgpt.patch
 
-          # Write the raw body safely. Single-quoted heredoc prevents any shell expansion
-          # so backticks in the Markdown code fence are not executed.
-          cat > "$BODY_FILE" <<'__RAW_BODY__'
-${{ github.event.issue.body || github.event.comment.body }}
-__RAW_BODY__
+          # Pull the issue/comment body directly from the event payload
+          jq -r '.issue.body // .comment.body // empty' "$GITHUB_EVENT_PATH" > "$BODY_FILE"
 
           echo "---- BEGIN RAW BODY (first 40 lines) ----"
           head -n 40 "$BODY_FILE" || true
           echo "---- END RAW BODY ----"
 
-          # Extract the FIRST fenced code block AFTER the [CHATGPT PATCH] marker
+          # Grab the FIRST fenced block AFTER the [CHATGPT PATCH] marker
           awk '
             BEGIN { seen_hdr=0; in_block=0 }
             /\[CHATGPT PATCH\]/ { seen_hdr=1; next }
-            seen_hdr && /^```/ {
-              if (in_block==0) { in_block=1; next } else { exit }
-            }
+            seen_hdr && /^```/ { if (!in_block) { in_block=1; next } else { exit } }
             seen_hdr && in_block { print }
           ' "$BODY_FILE" > "$PATCH_FILE"
 
@@ -95,7 +89,6 @@ __RAW_BODY__
             fi
           fi
 
-          # Commit if there are changes
           if ! git diff --quiet || ! git diff --cached --quiet; then
             git add -A
             git commit -m "Apply ChatGPT patch from issue #${{ github.event.issue.number }}"
@@ -126,4 +119,3 @@ __RAW_BODY__
           else
             gh pr create --head dev --base main --title "$TITLE" --body "$BODY"
           fi
-
