@@ -26,18 +26,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Use runner temp, never the repo dir
           BODY_FILE="$RUNNER_TEMP/body.txt"
           PATCH_FILE="$RUNNER_TEMP/chatgpt.patch"
 
-          # Pull the issue/comment body directly from the event payload
           jq -r '.issue.body // .comment.body // empty' "$GITHUB_EVENT_PATH" > "$BODY_FILE"
 
           echo "---- BEGIN RAW BODY (first 40 lines) ----"
           head -n 40 "$BODY_FILE" || true
           echo "---- END RAW BODY ----"
 
-          # Grab the FIRST fenced block AFTER the [CHATGPT PATCH] marker
           awk '
             BEGIN { seen_hdr=0; in_block=0 }
             /\[CHATGPT PATCH\]/ { seen_hdr=1; next }
@@ -60,24 +57,18 @@ jobs:
         shell: bash
         run: |
           set -e
-          # Remove any stray temp files that might exist in repo from old runs
           rm -f body.txt chatgpt.patch || true
-
-          # Ensure we start from latest main, no rebase state
           git rebase --abort || true
           git cherry-pick --abort || true
           git am --abort || true
-
           git fetch origin --prune
 
-          # Create dev if missing; otherwise check it out
           if git ls-remote --exit-code --heads origin dev >/dev/null 2>&1; then
             git checkout -B dev origin/dev
           else
             git checkout -B dev origin/main || git checkout -B dev main
           fi
 
-          # Hard reset dev to latest main to avoid lingering rebase/cherry-pick state
           git fetch origin main
           git reset --hard origin/main
 
@@ -85,14 +76,14 @@ jobs:
         shell: bash
         run: |
           set -e
+          # FIX: set committer identity globally so commits work
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Make sure no rebase/cherry-pick state is active
           git rebase --abort || true
           git cherry-pick --abort || true
           git am --abort || true
 
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           PATCH="${{ steps.extract.outputs.patch_file }}"
 
           if git apply --3way --ignore-space-change --whitespace=fix "$PATCH"; then
@@ -108,7 +99,6 @@ jobs:
             fi
           fi
 
-          # Commit only repo changes (no temp files; they live in $RUNNER_TEMP anyway)
           if ! git diff --quiet || ! git diff --cached --quiet; then
             git add -A
             git commit -m "Apply ChatGPT patch from issue #${{ github.event.issue.number }}"
@@ -132,7 +122,6 @@ jobs:
           TITLE="ChatGPT Patch from Issue #${{ github.event.issue.number }}"
           BODY=$'This pull request was automatically created from a [CHATGPT PATCH] submission.\n\n- Source issue: #${{ github.event.issue.number }}'
 
-          # Find existing PR from dev -> main (any state)
           PR_NUMBER="$(gh api -X GET "/repos/${OWNER_REPO}/pulls?head=${{ github.repository_owner }}:dev&base=main&state=all" -q '.[0].number' || true)"
 
           if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" != "null" ]; then
@@ -142,5 +131,4 @@ jobs:
           else
             gh api -X POST "/repos/${OWNER_REPO}/pulls" \
               -f title="$TITLE" -f head="dev" -f base="main" -f body="$BODY" >/dev/null
-            echo "Created new PR from dev -> main"
-          fi
+            echo "
