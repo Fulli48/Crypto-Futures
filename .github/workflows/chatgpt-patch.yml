@@ -27,7 +27,7 @@ jobs:
           git config --global user.name  "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Extract patch from issue/comment body (via event JSON)
+      - name: Extract patch from issue/comment body (inside OR outside fence)
         id: extract
         shell: bash
         run: |
@@ -37,23 +37,40 @@ jobs:
 
           jq -r '.issue.body // .comment.body // empty' "$GITHUB_EVENT_PATH" > "$BODY_FILE"
 
-          echo "---- BEGIN RAW BODY (first 40 lines) ----"
-          head -n 40 "$BODY_FILE" || true
-          echo "---- END RAW BODY ----"
-
+          # Extract rules:
+          # 1) If [CHATGPT PATCH] appears BEFORE a code fence, capture the next fenced block.
+          # 2) If [CHATGPT PATCH] appears INSIDE a fenced block, capture that same block,
+          #    excluding the marker line itself.
           awk '
-            BEGIN { seen_hdr=0; in_block=0 }
-            /\[CHATGPT PATCH\]/ { seen_hdr=1; next }
-            seen_hdr && /^```/ { if (!in_block) { in_block=1; next } else { exit } }
-            seen_hdr && in_block { print }
+            BEGIN { in=0; has=0; n=0; after=0 }
+            # fence line
+            /^```/ {
+              if (!in) { in=1; has=0; n=0; next }
+              else {
+                if (in && has) { for (i=1;i<=n;i++) print buf[i]; exit }
+                in=0; next
+              }
+            }
+            {
+              if (in) {
+                if (index($0, "[CHATGPT PATCH]")) { has=1; next }   # ignore marker line
+                buf[++n]=$0
+              } else {
+                if (index($0, "[CHATGPT PATCH]")) { after=1 }       # header BEFORE fence
+                else if (after && /^```/) { in=1; has=1; n=0; after=0; next }
+              }
+            }
+            END {
+              if (in && has) { for (i=1;i<=n;i++) print buf[i] }
+            }
           ' "$BODY_FILE" > "$PATCH_FILE"
 
-          echo "---- BEGIN EXTRACTED PATCH (first 80 lines) ----"
-          head -n 80 "$PATCH_FILE" || true
+          echo "---- BEGIN EXTRACTED PATCH (first 60 lines) ----"
+          head -n 60 "$PATCH_FILE" || true
           echo "---- END EXTRACTED PATCH ----"
 
           if [ ! -s "$PATCH_FILE" ]; then
-            echo "ERROR: No fenced patch block found after [CHATGPT PATCH]." >&2
+            echo "ERROR: No valid patch content found near [CHATGPT PATCH]." >&2
             exit 1
           fi
 
@@ -68,13 +85,11 @@ jobs:
           git cherry-pick --abort || true
           git am --abort || true
           git fetch origin --prune
-
           if git ls-remote --exit-code --heads origin dev >/dev/null 2>&1; then
             git checkout -B dev origin/dev
           else
             git checkout -B dev origin/main || git checkout -B dev main
           fi
-
           git fetch origin main
           git reset --hard origin/main
 
@@ -82,7 +97,6 @@ jobs:
         shell: bash
         run: |
           set -e
-          # safety again before any commit
           git config --global user.name  "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
@@ -121,36 +135,33 @@ jobs:
       - name: Ensure PR dev -> main exists (robust; skip when no diffs)
         shell: bash
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # or ${{ secrets.GH_PAT }} if you created one
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-
           OWNER_REPO="${GITHUB_REPOSITORY}"
           TITLE="ChatGPT Patch from Issue #${{ github.event.issue.number }}"
           BODY="Automated PR created from a [CHATGPT PATCH] in issue #${{ github.event.issue.number }}."
 
           echo "== PR STEP START =="
-
-          # Make sure we have fresh refs
           git fetch origin main dev || git fetch origin
-
-          # Use remote refs for a stable comparison
           AHEAD="$(git rev-list --left-right --count origin/main...origin/dev | awk '{print $2}')" || AHEAD=0
           echo "dev ahead of main by ${AHEAD:-0} commits"
-
           if [ "${AHEAD:-0}" = "0" ]; then
             echo "Nothing to PR (dev == main). Skipping PR creation."
             exit 0
           fi
 
-          echo "Checking for an existing PR dev -> main…"
           PR_NUMBER="$(gh pr list --head dev --base main --state all --json number -q '.[0].number' || true)"
           echo "Existing PR number: ${PR_NUMBER:-<none>}"
-
           if [[ -n "$PR_NUMBER" && "$PR_NUMBER" != "null" ]]; then
-            echo "Updating existing PR #$PR_NUMBER"
-            gh api -X PATCH "/repos/${OWNER_REPO}/pulls/${PR_NUMBER}" \
-              -f state=open -f title="$TITLE" -f body="$BODY" >/dev/null
+            STATE="$(gh pr view "$PR_NUMBER" --json state -q .state 2>/dev/null || echo unknown)"
+            echo "Existing PR state: $STATE"
+            if [ "$STATE" != "open" ]; then
+              echo "Reopening PR #$PR_NUMBER via issues API…"
+              gh api -X PATCH "/repos/${OWNER_REPO}/issues/${PR_NUMBER}" -f state=open >/dev/null
+            fi
+            echo "Updating PR #$PR_NUMBER title/body…"
+            gh api -X PATCH "/repos/${OWNER_REPO}/pulls/${PR_NUMBER}" -f title="$TITLE" -f body="$BODY" >/dev/null
             echo "PR #$PR_NUMBER updated."
             exit 0
           fi
@@ -161,17 +172,15 @@ jobs:
             -f title="$TITLE" -f head="dev" -f base="main" -f body="$BODY" >/dev/null
           STATUS=$?
           set -e
-
           if [ $STATUS -ne 0 ]; then
-            echo "Create returned non-zero ($STATUS). Checking if PR now exists (race/422)…"
+            echo "Create returned $STATUS; checking if PR exists now…"
             PR_NUMBER="$(gh pr list --head dev --base main --state all --json number -q '.[0].number' || true)"
             if [[ -n "$PR_NUMBER" && "$PR_NUMBER" != "null" ]]; then
-              echo "PR already exists as #$PR_NUMBER. Marking success."
+              echo "PR already exists as #$PR_NUMBER. Success."
               exit 0
             fi
             echo "PR creation failed and no PR found. Failing."
             exit 1
           fi
-
           echo "PR created successfully."
           echo "== PR STEP END =="
