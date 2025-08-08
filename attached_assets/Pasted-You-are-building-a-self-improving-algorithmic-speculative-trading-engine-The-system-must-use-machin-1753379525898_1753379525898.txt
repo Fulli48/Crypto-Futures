@@ -1,0 +1,64 @@
+You are building a self-improving algorithmic speculative trading engine. The system must use machine-learned feature weights to generate trade signals and refine itself based on trade outcomes. Modify your existing trade system to incorporate the following logic while ensuring all new data is either added to or updates existing fields within each trade dictionary, without overwriting or removing any unrelated fields.
+
+Start by initializing a dictionary called feature_learning_stats where each feature has a default weight of 5.0 and a usage count of 0:
+feature_learning_stats = {
+    "rsi": { "weight": 5.0, "used": 0 },
+    "macd": { "weight": 5.0, "used": 0 },
+    "bollinger": { "weight": 5.0, "used": 0 },
+    "stochastic": { "weight": 5.0, "used": 0 },
+    "ema": { "weight": 5.0, "used": 0 },
+    "support_resistance": { "weight": 5.0, "used": 0 },
+    "market_structure": { "weight": 5.0, "used": 0 },
+    "patterns": { "weight": 5.0, "used": 0 },
+    "volatility": { "weight": 5.0, "used": 0 },
+    "volume_profile": { "weight": 5.0, "used": 0 }
+}
+
+When a trade is completed, ensure that the existing trade dictionary is updated (not replaced) with these new keys and values:
+- If the key already exists, overwrite it.
+- If it does not exist, add it.
+Use the following structure to update the dictionary:
+trade["features"] = trade.get("features", { "rsi": 0, "macd": 0, ..., "volume_profile": 0 })
+trade["pnl"] = existing_value_or_new
+trade["mfe"] = existing_value_or_new
+trade["drawdown"] = existing_value_or_new
+trade["confidence"] = existing_value_or_new
+trade["reached_tp"] = existing_value_or_new
+
+Define a function to calculate a reward score from trade outcome data:
+def calculate_trade_reward(pnl, mfe, drawdown, reached_tp):
+    reward = pnl
+    reward += mfe * 0.5
+    reward -= drawdown * 0.75
+    if reached_tp:
+        reward += 5
+    return round(reward, 4)
+
+Define a weight update function that reinforces features used in the trade:
+def update_feature_weights(trade, reward):
+    for feature, used in trade["features"].items():
+        if used:
+            stats = feature_learning_stats[feature]
+            stats["used"] += 1
+            decay = max(0.01, 1 / (stats["used"] ** 0.5))
+            adjustment = reward * decay
+            stats["weight"] += adjustment
+            stats["weight"] = max(0.1, min(stats["weight"], 10.0))
+
+Define a master learning function:
+def process_trade_learning(trade):
+    reward = calculate_trade_reward(trade["pnl"], trade["mfe"], trade["drawdown"], trade["reached_tp"])
+    update_feature_weights(trade, reward)
+    trade["reward"] = reward
+
+Use the following function to score trade candidates during signal evaluation:
+def calculate_trade_score(signal_set):
+    score = 0
+    for feature, value in signal_set.items():
+        weight = feature_learning_stats[feature]["weight"]
+        score += value * weight
+    return round(score, 4)
+
+Only allow trades to be taken when score >= threshold (e.g., 30) and confidence >= 0.6. Also ensure cooldown logic or other constraints are respected if implemented.
+
+After each trade, append the updated trade dictionary to your trade history log or buffer. Do not remove or overwrite existing keys unless they are one of the ones explicitly listed above. This ensures your current storage logic is preserved, while integrating this intelligent self-improving learning system that will adjust feature weights per trade, learn over time, and eventually converge toward highly optimized signal weighting.

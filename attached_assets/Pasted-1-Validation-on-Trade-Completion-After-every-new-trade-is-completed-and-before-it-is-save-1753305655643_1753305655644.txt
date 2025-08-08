@@ -1,0 +1,32 @@
+1. **Validation on Trade Completion:**
+   - After every new trade is completed and before it is saved, check that the following fields are all present and not missing or N/A:
+     - id, signal, symbol, duration, entry, TP, SL, outcome, P&L, max profit, max loss, time profitable, duration(min), success score, MFE, drawdown, completed
+   - If any of these fields is missing, null, NaN, undefined, empty string, or reads as 'N/A', do not save this trade to the stored trades table or database.
+   - Instead, log an error with the trade’s temporary ID and details about which fields are missing.
+
+2. **Data Cleanup for Existing Trades:**
+   - Scan all currently stored/completed trades in both the backend data table and the UI display.
+   - For each trade, check all required fields listed above.
+   - If any trade has any field with a missing value or 'N/A', remove that trade from both:
+     - The internal data table/storage
+     - The UI table/chart (so it is no longer displayed)
+
+3. **Ongoing Monitoring:**
+   - Add a monitoring/checking step so that anytime the UI table or backend storage is loaded or refreshed, it will automatically filter out and remove any trades with missing values.
+   - Ensure that these trades are not just hidden, but actually deleted from storage.
+
+4. **Troubleshoot Data Storing Function:**
+   - Carefully review the function that saves new trades when they complete.
+   - For any trade where a required field is missing or returns 'N/A', trace back step-by-step:
+     - Where is the value supposed to be set? (simulation engine, API, model output, etc.)
+     - Is the value being calculated but not passed to the save function?
+     - Is there a typo, logic error, or async issue preventing the value from being populated?
+     - Are there any error logs, exceptions, or edge cases that could explain the missing value?
+
+5. **Fix and Enforce:**
+   - After identifying the cause, fix the root of the issue so that all required fields are always set before saving.
+   - Add a hard validation/error in the save function: do not permit saving if any field is missing.
+   - Document these validation steps in the codebase for future maintenance.
+
+**Goal:**  
+Ensure that only fully complete trade records (with all required data) are stored and displayed. Detect, remove, and prevent any trade with missing data from entering the system, and clearly log any attempted saves with incomplete information for developer review.

@@ -1,0 +1,39 @@
+Completely upgrade the trade performance evaluation system as follows:
+
+1. **Replace Old Success/Failure Rule:**
+    - Remove all use of the previous dual-criteria method (P&L > 0% and ≥51% time in profit) for determining trade success or failure.
+    - Instead, compute a weighted “successScore” for each completed trade using this formula (all percentage values as decimals, e.g., +5% = 0.05):
+
+      ```
+      success_score = (
+          0.5 * tanh(final_net_profit_pct) +
+          0.2 * time_in_profit_ratio +
+          0.15 * tanh(max_favorable_excursion_pct) -
+          0.15 * abs(tanh(max_drawdown_pct))
+      )
+      ```
+      - `final_net_profit_pct`: Final realized profit or loss as a decimal
+      - `time_in_profit_ratio`: Percent of trade duration spent in profit (0–1)
+      - `max_favorable_excursion_pct`: Highest unrealized profit (decimal)
+      - `max_drawdown_pct`: Largest unrealized loss (decimal, apply tanh to absolute value as shown)
+
+    - Set a configurable threshold (suggest starting at 0.1).  
+      - If a trade’s successScore is **greater than or equal to** this threshold, classify it as a **success**; otherwise, as a **failure**.
+
+2. **Update All Algorithm Success Metrics:**
+    - Refactor every system component (backend, frontend, API endpoints, analytics, dashboards, rolling window logic) that previously relied on the dual-criteria rule to use this new successScore-based classification.
+    - All metrics such as:
+        - **Recent Success Rate** (e.g., last 100 trades)
+        - **Baseline/Historical Success Rate** (e.g., oldest 100 in 500-trade buffer)
+        - **Improvement Percentage**
+        - **Live Smoothed/Decay-Based Success Rate**
+        - **Total Successes/Failures in UI**
+      should now count a trade as a “success” only if it meets or exceeds the new successScore threshold.
+
+3. **Clean Up and Documentation:**
+    - Remove or update all code, comments, tooltips, UI elements, and documentation that refer to the old dual-criteria method.
+    - Clearly explain the new successScore formula and classification threshold wherever success/failure is displayed or described to users.
+    - Allow the threshold to be easily configured and adjusted for future optimization.
+
+**Goal:**  
+Ensure the new weighted successScore system is the **sole** basis for all success/failure logic and algorithm performance metrics throughout the entire platform, with clear, accurate, and user-friendly reporting.

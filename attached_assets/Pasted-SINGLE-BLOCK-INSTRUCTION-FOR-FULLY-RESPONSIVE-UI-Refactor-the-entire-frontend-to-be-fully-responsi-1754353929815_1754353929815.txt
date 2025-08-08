@@ -1,0 +1,64 @@
+SINGLE BLOCK INSTRUCTION FOR FULLY RESPONSIVE UI:
+
+Refactor the entire frontend to be fully responsive so all UI components automatically adjust their size, spacing, layout, and arrangement based on the current browser window size and device type (desktop, tablet, mobile). Implement the following:
+
+Use a Responsive UI Framework:
+
+Utilize a modern CSS framework with built-in responsiveness (such as Tailwind CSS, Chakra UI, or MUI for React).
+
+All sizing, spacing, and typography should use framework classes or props that support breakpoints (e.g., sm:, md:, lg:, xl: in Tailwind).
+
+Grid and Flex Layouts:
+
+Structure main content areas, cards, and sections using CSS grid or flexbox layouts.
+
+Ensure containers automatically switch from multi-column (horizontal) layouts on large screens to single-column (vertical) stacks on smaller screens using responsive classes or media queries.
+
+Component Responsiveness:
+
+For each UI component (header, navbar, buttons, cards, charts, tables, modals, etc):
+
+Set width, height, padding, and margin using relative units or responsive classes (w-full, max-w-screen-lg, p-2 md:p-6, etc).
+
+Adjust font sizes, icon sizes, and button sizes based on breakpoints (text-base md:text-xl).
+
+Hide, Show, or Reorder Elements as Needed:
+
+Use conditional rendering or responsive CSS to hide or show components (such as sidebars or extra controls) at different breakpoints (hidden md:block for desktop-only, etc).
+
+Reorder grid/flex items as needed for best mobile usability.
+
+Charts and Tables:
+
+Ensure all charts and tables are set to 100% width of their parent container and allow horizontal scrolling on small screens (overflow-x-auto).
+
+Adjust label font sizes and axis tick density at smaller breakpoints.
+
+Modals and Drawers:
+
+All popups, modals, and drawers must scale to a percentage of the viewport (w-full max-w-md, h-[90vh], etc) and remain centered or docked appropriately.
+
+Test All States:
+
+Simulate or test all UI screens and interactions at a range of window widths (e.g., 320px, 768px, 1024px, 1440px).
+
+Ensure no element overlaps, gets cut off, or becomes unusable at any size.
+
+Accessibility and Usability:
+
+Ensure buttons, text fields, and touch targets remain easily tappable at mobile sizes.
+
+Use adequate color contrast, scalable icons, and legible font sizes at all resolutions.
+
+Code Structure:
+
+Use reusable responsive components wherever possible, with props or CSS classes for breakpoint-specific styling.
+
+Document all responsive logic and classes in the component files.
+
+Optional: Add Window Resize Listeners:
+
+For highly dynamic components (e.g., chart resizing), add JavaScript or React hooks (useWindowSize or similar) to automatically trigger re-layouts or re-rendering when the window is resized.
+
+Result:
+All UI components will seamlessly adapt to any device or screen size, preserving full functionality, readability, and usability—delivering a professional and modern user experience on desktop, tablet, and mobile.

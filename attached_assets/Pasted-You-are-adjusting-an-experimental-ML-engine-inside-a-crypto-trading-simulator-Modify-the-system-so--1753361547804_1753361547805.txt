@@ -1,0 +1,53 @@
+You are adjusting an experimental ML engine inside a crypto trading simulator. Modify the system so the experimental engine runs alongside the main model. It should occasionally try bold weight variations, simulate trades with them, and merge only the successful changes into the main model. Implement all of the following in one unified code block.
+
+Start by adding global configuration:
+
+import random, time
+experiment_frequency = 0.05
+perturbation_strength = 0.2
+merge_ratio = 0.1
+experiment_logs = []
+
+Next, define the experiment runner function:
+
+def run_experiment_trade(model, baseline_profit, baseline_confidence):
+    base_weights = model.get_weights()
+    experiment_weights = [
+        w * (1 + random.uniform(-perturbation_strength, perturbation_strength))
+        for w in base_weights
+    ]
+    sim_result = simulate_trade_with_weights(model, experiment_weights)
+    accepted = is_better_than_baseline(sim_result, baseline_profit, baseline_confidence)
+    if accepted:
+        new_weights = [
+            (1 - merge_ratio) * base + merge_ratio * exp
+            for base, exp in zip(base_weights, experiment_weights)
+        ]
+        model.set_weights(new_weights)
+    experiment_logs.append({
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "base_profit": baseline_profit,
+        "experiment_profit": sim_result['net_profit'],
+        "experiment_confidence": sim_result['confidence'],
+        "accepted": accepted,
+        "experiment_weights": experiment_weights
+    })
+
+Add the helper function to evaluate experiment success:
+
+def is_better_than_baseline(sim_result, baseline_profit, baseline_confidence):
+    return sim_result["net_profit"] > baseline_profit and sim_result["confidence"] > baseline_confidence
+
+In the main training loop or decision logic, insert this to occasionally trigger the experiment engine:
+
+if random.random() < experiment_frequency:
+    run_experiment_trade(model, baseline_profit, baseline_confidence)
+
+Finally, ensure the function simulate_trade_with_weights(model, weights) exists and returns:
+
+{
+    "net_profit": float,
+    "confidence": float
+}
+
+The experimental engine should never interrupt or replace the main model’s training. It must run in parallel, make bold perturbation tests, and only influence the core model if the results clearly outperform baseline performance. All results are logged in experiment_logs with timestamps, outcome metrics, weights, and success status.

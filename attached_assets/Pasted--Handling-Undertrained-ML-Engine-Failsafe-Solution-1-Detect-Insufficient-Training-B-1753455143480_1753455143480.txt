@@ -1,0 +1,52 @@
+### Handling Undertrained ML Engine – Failsafe Solution
+
+1. **Detect Insufficient Training:**
+   - Before generating or displaying trade signals, check these conditions:
+     - The total number of completed, fully analyzed trades is less than a safe threshold (suggested: 50 or 100).
+     - OR the moving average confidence of all predictions is below a minimal viable threshold (suggested: 35%).
+
+   - Example check:
+     ```js
+     const minTradeHistory = 50;
+     const minConfidenceLevel = 35;
+     const isUndertrained = (
+       this.performanceMetrics.completedTradeCount < minTradeHistory ||
+       mean(this.performanceMetrics.recentConfidences) < minConfidenceLevel
+     );
+     ```
+
+2. **Adaptive Failsafe:**
+   - If undertrained, do NOT generate or display real trades/simulations.
+   - Instead, return a "no-trade" status and show an explanatory message.
+
+   - Example action:
+     ```js
+     if (isUndertrained) {
+       // Block creation/display of trade signals
+       return {
+         signals: [],
+         status: 'undertrained',
+         message: 'The AI needs more trade data to confidently generate signals. As more trade outcomes are collected, the system will begin producing actionable trade opportunities.'
+       };
+     }
+     ```
+
+3. **Simulation Mode Option (Optional):**
+   - If desired, allow an "exploratory simulation mode" using default/static model weights with a clear warning:
+     - "Simulations are for demonstration only until the AI has learned from enough real trades."
+
+4. **UI Feedback:**
+   - In the app, if `status === 'undertrained'`, display:
+     - "Training in progress: The AI is learning from real trades. Trade signals will appear once the system is confident enough to provide high-quality suggestions. Check back soon!"
+
+5. **Automatic Transition:**
+   - Once the trade count and/or average confidence pass the minimums, the normal signal generation resumes automatically.
+
+---
+
+**Summary:**  
+Before creating or showing trades, always check if the ML engine is trained enough. If not, block trade creation and display a clear, encouraging message. Optionally, enable a simulation-only/demo mode with an appropriate warning. Resume normal operation automatically when enough data is available.
+
+---
+
+> *Copy this block to your code agent. Implement these checks and user messaging to ensure your trading engine never displays or simulates risky signals before sufficient ML training is complete.*

@@ -1,0 +1,37 @@
+Apply the following visual corrections to the stat section inside the “Cryptocurrency Trading Intelligence” container. These are *precision layout fixes* to adjust alignment, sizing, and icon styling.
+
+DO NOT alter any styling related to fonts, card layout, or button appearance — only apply the changes described below:
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––
+🧠 BRAIN ICON ADJUSTMENTS:
+
+1. The brain icon must be scaled down to **approximately 50% of its current size**.
+   • Target size: `font-size: 1rem` to `1.2rem` or equivalent pixel value
+   • Use `transform: scale(0.5)` if it maintains clarity
+   • Do not apply padding or margin that causes it to float visually off-center
+
+2. **Remove the dark border or circular container** around the brain icon.
+   • The brain must be displayed directly without any surrounding background, ring, or container
+   • Remove any border-radius, background-color, or box-shadow applied to it
+
+3. Make sure the icon itself still uses the **white outline brain icon** consistent with the rest of the app. Do NOT use emoji or the detailed neon one.
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––
+📐 CENTERING FIX:
+
+4. Visually and mathematically center the brain **between the two stat titles only**:
+   • This means the brain should sit horizontally aligned between:
+     “Expected Profit Strength” and “Trade Failure Rate”
+   • It should NOT align with the paragraphs or descriptions below
+   • Use Flexbox with `justify-content: space-between` and a fixed-width brain icon container to guarantee proper centering between the **titles**
+   • Use margin-top: 0.5rem to visually align the brain icon just under the stat titles if needed
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––
+✅ FINAL BEHAVIOR:
+
+• Brain icon is smaller, clean, and subtle (outline only)
+• It sits directly and evenly between the two stat **titles**
+• No visual border, background, or padding around the brain
+• Existing card styling, dark theme, stat block layout, and button appearance must remain untouched
+
+If layout requires spacing assistance, use Flexbox gaps or `margin-inline` on the brain container. Be precise and test the alignment visually.

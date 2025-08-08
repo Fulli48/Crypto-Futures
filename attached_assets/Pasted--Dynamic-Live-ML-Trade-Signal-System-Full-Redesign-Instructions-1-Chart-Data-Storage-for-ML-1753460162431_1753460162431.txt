@@ -1,0 +1,54 @@
+### Dynamic Live ML Trade Signal System – Full Redesign Instructions
+
+**1. Chart Data Storage for ML Signal Generation**
+- For each tracked coin (BTC, ETH, SOL, XRP, ADA, HBAR), create and maintain a rolling time-series chart dataset in your backend (database or efficient in-memory store).
+- Every new OHLCV (open, high, low, close, volume) tick received from your price API must be **appended** to that symbol’s dataset.  
+- Ensure each coin’s chart data is **complete and up to date** before the ML engine attempts to generate or update any trade signal.
+    - If the chart data is missing or incomplete, **defer signal generation** for that coin and log a warning (or return a UI "waiting for data" message for that coin).
+
+**2. Real-Time Price & Signal Refresh (3s Interval, Smooth UI)**
+- For each active coin, set up a backend timer/loop that, **every 3 seconds**:
+    - a) Fetches the latest price/ohlcv and appends to the backend chart dataset.
+    - b) Triggers the ML engine to **re-evaluate the trade signal** using the complete, most recent chart data for that symbol.
+    - c) Updates the live trade suggestion (direction, confidence, TP, SL, etc.) if warranted by the new data.
+    - d) Stores the new signal and its state for frontend retrieval.
+
+- **Frontend/UI:**  
+    - The UI should **automatically poll** the backend for signal/trade updates every 3 seconds per symbol, updating the displayed info in-place.
+    - Update all relevant fields (price, confidence, badges, direction, P&L, etc.) using a **smooth animation or fade transition** if your framework supports it (to avoid jarring jumps).
+    - There should be **no manual refresh button**—the user sees an always-live, up-to-date view with no intervention required.
+
+**3. Trade Signal Status & Confidence Filtering (Dynamic, Transparent)**
+- The ML engine, during each 3s update, must:
+    - a) Evaluate if the current trade (or new trade suggestion) meets your confidence/profit likelihood quality filters.
+    - b) If the trade is **desirable** (passes filters), display it as a recommended/active trade (with badges for QUALITY, MODERATE, etc.).
+    - c) If the trade is **undesirable** (filtered out by current confidence or profit likelihood), display it **with a clear indication** (e.g. “Filtered Out: Not Currently Recommended”), but **still show all live details** (so users can inspect the reasoning, e.g. "Confidence dropped below 45%").
+    - d) Display the live trade’s stats, chart, and updated recommendation badge regardless of desirability, so the user always sees what’s happening under the hood.
+
+**4. Backend/Frontend Data Structure**
+- For each symbol, the backend should expose via API:
+    - a) Current chart data (e.g., last N minutes/hours for the chart panel)
+    - b) Current suggested trade: direction, confidence, TP, SL, live P&L, profit likelihood, and badge (including “filtered out” status)
+    - c) Full historical evolution of the signal (optional: for pop-out details/history view)
+
+- The frontend should **continuously display**:
+    - a) The live chart, updating every 3 seconds using backend-supplied data
+    - b) The trade suggestion panel, updating with the latest trade info, confidence, and recommendation badge (even if filtered out)
+    - c) An explanatory subheading/tooltip when a trade is filtered out, e.g. “This trade no longer meets quality criteria but is shown for transparency.”
+
+**5. Automation & Self-Healing**
+- The system must operate **entirely automatically**: no refresh buttons, no manual intervention.
+- If chart data lags or API data is missing for any symbol, the backend should skip signal updates for that symbol and notify the frontend, which can show a “waiting for data” or “market data delayed” message only for the affected coin(s).
+
+---
+
+**Summary:**  
+- Backend continuously appends latest chart data per coin, never overwriting, and ensures full chart is present before running ML.
+- Every 3 seconds: price, chart, and signal update in backend, and UI auto-polls to keep display perfectly in sync, always showing both desirable and undesirable trades (with clear labels).
+- No manual refresh; UI transitions are smooth and user-friendly.
+- Filtered-out trades are still visible, with full data and a “not currently recommended” badge, for user insight and trust.
+
+---
+
+**Direct Instruction to AI Agent:**  
+Implement all logic above, refactor your ML signal and UI update system so that trade suggestions are continuously updated, always live, always display the reasoning and quality of both recommended and filtered-out trades, and all user experience is seamless and automatic.

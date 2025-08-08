@@ -1,0 +1,96 @@
+📌 TRADE SUCCESS SCORING SYSTEM – FULL DESCRIPTION FOR IMPLEMENTATION
+Create a function called calculate_trade_success_odds that evaluates the success likelihood of a simulated crypto trade. This function is intended to be used in a system that tests trades over multiple durations (e.g., 5min, 10min, 15min) and measures how long, and how well, the trade would have been profitable.
+
+This success score is based on a hybrid confidence algorithm that blends 4 different factors:
+
+✅ INPUT PARAMETERS:
+The function should accept the following arguments:
+
+entry_price: float — The price at which the trade started.
+
+position_type: str — Either "LONG" or "SHORT".
+
+price_series: List[float] — A list of prices recorded per second (or at consistent time intervals) for the duration of the trade.
+
+profit_threshold: float — Optional. Minimum required profit (absolute) to consider an exit "profitable". Default is 0.0.
+
+✅ SCORING SYSTEM:
+The function should calculate a final_score (0.0 to 1.0) representing the confidence that this trade was a good suggestion. It should combine the following 4 components:
+
+1. Time-in-Profit Ratio (Weight = 0.4)
+This measures the percentage of the total trade duration that was profitable (i.e., price moved in the right direction past the profit threshold).
+
+For LONG trades: price > entry_price + profit_threshold
+
+For SHORT trades: price < entry_price - profit_threshold
+
+Calculate this ratio as:
+
+python
+Copy
+Edit
+profitable_seconds / total_seconds
+2. Weighted Profit Score (Weight = 0.3)
+This measures the magnitude of profitable moments, rewarding stronger and deeper profit windows.
+
+For each timestamp:
+
+LONG: profit = price - entry_price
+
+SHORT: profit = entry_price - price
+
+If profit > 0, add it to a list; otherwise add 0
+
+Then normalize:
+
+python
+Copy
+Edit
+weighted_profit_score = sum(profit_values) / (len(price_series) * max_profit_seen)
+Where max_profit_seen is the max of all profit values (use a small nonzero constant if 0).
+
+3. Cluster Consistency Score (Weight = 0.2)
+This captures how sustained the profitable moments were — not just single spikes.
+
+Find all consecutive sequences of profitable seconds ("clusters").
+
+Count the number of clusters and the duration of the longest cluster.
+
+Calculate:
+
+python
+Copy
+Edit
+cluster_score = (
+    (num_clusters / (total_seconds / 10)) * 0.5 +
+    (longest_cluster / total_seconds) * 0.5
+)
+Make sure cluster_score is capped at 1.0.
+
+4. Binary Success Flag (Weight = 0.1)
+This is a simple check: Did the trade ever reach a continuous profitable streak of at least 30 seconds?
+
+If yes, set:
+
+python
+Copy
+Edit
+binary_success_flag = 1.0
+Otherwise:
+
+python
+Copy
+Edit
+binary_success_flag = 0.0
+✅ FINAL SCORE CALCULATION
+Use the following formula to compute the final score:
+
+python
+Copy
+Edit
+final_score = (
+    0.4 * time_in_profit_ratio +
+    0.3 * weighted_profit_score +
+    0.2 * cluster_score +
+    0.1 * binary_success_flag
+)

@@ -1,0 +1,79 @@
+Please update the way the Algorithm Success Rate % is calculated and displayed.
+
+🔧 New Goal:
+Smooth the success rate to avoid rapid changes when old trades leave and new ones enter the 50-trade window. Instead of recalculating the success rate entirely from scratch every time, use a decay-based rolling average.
+
+✅ Here’s exactly what needs to be implemented:
+1. Persistent Variables (Global or Cached):
+js
+Copy
+Edit
+let decayedSuccessScore = initialSuccessRate   // e.g., 66.0 if known, else 0
+let decayedTradeCount = 50                     // matches current trade window size
+const DECAY = 0.98                              // decay factor per update
+These values should persist between trade evaluations.
+
+2. On Each New Trade Evaluation:
+Update these variables as follows:
+
+js
+Copy
+Edit
+// Step 1: Decay old score and count
+decayedSuccessScore *= DECAY
+decayedTradeCount *= DECAY
+
+// Step 2: Add the new trade’s result
+// Determine if the trade was successful using existing logic
+const newTradeSuccess = isTradeSuccessful(trade) ? 1 : 0
+
+// Step 3: Add the new trade to the decayed average
+decayedSuccessScore += newTradeSuccess
+decayedTradeCount += 1
+
+// Step 4: Calculate updated smoothed rate
+const smoothedSuccessRate = (decayedSuccessScore / decayedTradeCount) * 100
+This should replace the current success rate recalculation logic that re-analyzes all 50 trades at once.
+
+3. isTradeSuccessful(trade)
+Continue using your existing logic for determining whether a trade is successful:
+
+TP_HIT → success
+
+SL_HIT → failure
+
+EXPIRED → success/failure based on:
+
+profitableWindowPercent > 51% → success
+
+highestProfit / lowestLoss >= 1.5 AND profitableWindowPercent >= 20% → success
+
+lowestLoss / highestProfit >= 1.5 → failure
+
+else → fallback to final P&L
+
+Use this logic to return true or false for newTradeSuccess.
+
+4. Display
+Use smoothedSuccessRate in your UI as:
+
+js
+Copy
+Edit
+Algorithm Success Rate: ${smoothedSuccessRate.toFixed(1)}%
+You can still calculate % improvement like this:
+
+js
+Copy
+Edit
+const improvement = ((smoothedSuccessRate - previousSmoothedRate) / previousSmoothedRate) * 100
+5. Reset Mechanism (Optional)
+If the algorithm version changes:
+
+js
+Copy
+Edit
+if (currentAlgoVersion !== lastAlgoVersion) {
+  decayedSuccessScore = 0
+  decayedTradeCount = 0
+}

@@ -1,0 +1,84 @@
+Objective:
+Restore the dashboard UI for the Coinbase Perpetuals trading application to its last fully functional state. The layout, styles, text elements, interactive controls, data visualizations, and all UI sections (such as “Expected Profit Strength,” “Rolling 500-Trade Window,” “AI Trade Suggestions,” “Dynamic Live ML System,” “Live Learning System,” and associated metrics and buttons) must appear and function exactly as they did before the most recent breakage.
+
+Restoration Steps:
+
+UI Code Version Audit:
+
+Identify all recent changes to the frontend codebase (React/Next.js, CSS, or other framework).
+
+Locate the last working commit, snapshot, or backup of the dashboard UI.
+
+If using Git, check git log and run git diff HEAD~1 (or more history if needed) to see recent modifications.
+
+Revert or check out the last fully functional UI version as a temporary test.
+
+Core File Identification:
+
+Locate the main dashboard UI component(s), e.g., Dashboard.jsx, Dashboard.js, Dashboard.tsx, App.js, etc.
+
+Identify all supporting files: style sheets (.css, .scss), shared components, and configuration files for theme/dark mode.
+
+Restoration Actions:
+
+If the issue was caused by accidental deletion or file corruption, restore the previous file versions from backups or VCS (version control system).
+
+If not using VCS, check if Replit has “History” or “Snapshots” features and revert to the last good state.
+
+If the layout/styling broke due to recent code edits, undo all changes since the last working version, then reapply changes incrementally to identify the culprit.
+
+UI Structure and Content:
+
+Reconstruct all major sections based on your screenshot and the previous state:
+
+“Expected Profit Strength” (headline, explanation text)
+
+Rolling trade window stats
+
+Trade failure rate and no completed trades message
+
+Buttons: “View Chart Data,” “Learning System,” “Generate New Suggestions”
+
+AI Trade Suggestions and their descriptions
+
+Tabbed or expandable sections: “Live Generation,” “Pending Suggestions,” “Live Dashboard,” “Performance Metrics,” “Learning Analytics”
+
+Metrics bars for: Training Cycles, System Confidence, Tracked Symbols, Active Models, Learning Status, Forecast Signals
+
+Ensure all text, font sizes, icons, spacing, colors, and buttons match the original design.
+
+UI Logic Restoration:
+
+Verify that all UI elements (buttons, tabs, expandable sections) are interactive and display the correct components.
+
+Ensure data binding and state updates function as before (e.g., trade stats, system confidence, active models update live).
+
+Test for errors in the developer console and fix any broken event handlers or missing props/state.
+
+Styling and Theme Restoration:
+
+Ensure dark mode and all custom styles are correctly loaded (check CSS classnames, style files).
+
+Restore any lost global or component-level styles.
+
+Verify that the dashboard matches the look-and-feel in your screenshot.
+
+Testing:
+
+After restoring, run the app locally and on Replit preview to verify that:
+
+All components are visible and arranged as before.
+
+All metrics and data load and update live.
+
+All user interactions (tabs, buttons) work as intended.
+
+No console or rendering errors appear.
+
+Compare visually with your screenshot for pixel-perfect accuracy.
+
+Final Lock-In:
+
+Once confirmed, commit and document the restored state as a stable checkpoint.
+
+Optionally, create a backup of this working state for rapid recovery if needed again.

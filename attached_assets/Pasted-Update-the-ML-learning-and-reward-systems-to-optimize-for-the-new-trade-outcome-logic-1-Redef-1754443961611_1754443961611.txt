@@ -1,0 +1,28 @@
+Update the ML learning and reward systems to optimize for the new trade outcome logic:
+
+⸻
+
+	1.	Redefine “Success” and “Failure” for Learning:
+	•	Treat a trade as a success if its outcome is "TP_HIT" or "PULLOUT_PROFIT" (i.e., the trade hit take profit or spent the minimum required pullout time in profit).
+	•	Treat a trade as a failure if its outcome is "SL_HIT" or "NO_PROFIT" (i.e., hit stop loss or never offered a meaningful pullout window).
+	2.	Adjust All Learning/Reward Calculations:
+	•	Whenever calculating success ratio, positiveEvents, or successScore, use the updated definition above.
+	•	For “graded reward” calculations:
+	•	Assign +1.0 base reward for both "TP_HIT" and "PULLOUT_PROFIT".
+	•	Assign -1.0 base reward for both "SL_HIT" and "NO_PROFIT".
+	•	For both, continue applying MFE bonus and drawdown penalty as before.
+	3.	Update Aggressive Weight Adjustment Triggers:
+	•	For feature weighting and multiplier logic, always aggregate outcomes using this revised success/failure definition.
+	•	For indicator/event scoring:
+	•	"TP_HIT" or "PULLOUT_PROFIT" = positive event (+5 or +1, as current system assigns)
+	•	"SL_HIT" or "NO_PROFIT" = negative event (–3 or –1, as current system assigns)
+	•	For expired trades, use "PULLOUT_PROFIT" as a positive, "NO_PROFIT" as a negative.
+	4.	Success Ratio, Event Weighting, and Reward Adjustments:
+	•	All batch success ratio calculations (successRatio = positiveEvents / totalEvents) and adaptive boldness logic must use the new success/failure labeling.
+	•	Wherever code references “TP_HIT” or “SL_HIT”, update logic to also include "PULLOUT_PROFIT" and "NO_PROFIT" as appropriate.
+	5.	Update Any Historical Analysis, Stats, or Charts:
+	•	All stats, dashboards, and analytics using success/failure must be updated to reflect new outcome labeling.
+	•	Document these logic changes in system notes for future reference.
+	6.	Test and Tune:
+	•	After updating, test with new and historical data to confirm that weights, confidence, and boldness adapt to maximize the combined “TP_HIT + PULLOUT_PROFIT” rate and minimize “SL_HIT + NO_PROFIT” rate.
+	•	Monitor learning convergence and feature rankings to ensure the system rapidly focuses on features that deliver more frequent real-world profit opportunities.

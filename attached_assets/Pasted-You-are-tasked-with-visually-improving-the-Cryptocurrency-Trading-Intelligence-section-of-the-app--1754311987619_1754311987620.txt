@@ -1,0 +1,32 @@
+You are tasked with visually improving the "Cryptocurrency Trading Intelligence" section of the app. Apply the following changes precisely:
+
+1. Merge the title, subtitle, and stats into a single connected section styled as one cohesive block with a dark background, smooth border-radius, and soft box-shadow. Do not separate the header and stat cards.
+
+2. Center the heading "Cryptocurrency Trading Intelligence" and its subtext horizontally within the block. Ensure vertical spacing between the heading and the stats is aesthetically balanced.
+
+3. In the stats row, place the brain emoji icon (🧠) exactly centered horizontally between the two stat blocks: "Expected Profit Strength" and "Trade Failure Rate". Make sure this is visually balanced and symmetrical on all screen sizes.
+
+4. Each stat block should include:
+   - A bold numeric value (e.g., "0.0%") with red for "Profit Strength" and green for "Failure Rate"
+   - A bold title beneath it, split into two lines
+   - A smaller description beneath the title, with muted text color
+
+5. Below the stat row, include two gradient-glow pill-shaped buttons: "📊 View Chart Data" and "⚡ Learning System". Stack or wrap them responsively for mobile.
+
+6. Use the following style rules:
+   - `.intelligence-container`: dark background (#0f111b), border-radius: 16px, max-width: 800px, centered with padding: 2rem, soft box-shadow
+   - `.header-section h1`: font-size: 1.8rem, color: #5c8aff, centered
+   - `.subtext`: color: #90a4d4, font-size: 1rem
+   - `.stats-section`: flex row with two stat cards and a centered brain icon, gap: 1rem, wrap on mobile
+   - `.stat-card`: background-color: #1a1d2e, border-radius: 10px, inset glow, text-align: center
+   - `.stat-value`: font-size: 2rem, bold, red (#ff4c4c) or green (#00dd80)
+   - `.stat-title`: bold, line-break allowed
+   - `.stat-desc`: font-size: 0.8rem, color: #a8b3d9
+   - `.brain-icon`: font-size: 2rem, centered, color: #ccccff
+   - `.button-row button`: gradient background (#4a00e0 to #8e2de2), white text, border-radius: 50px, hover glow, responsive
+
+7. Make it fully mobile-responsive using media queries. On screens <600px, stack the stat blocks and buttons vertically.
+
+8. Implement this entire section as a single reusable React component or HTML/CSS block depending on the project structure.
+
+Once complete, replace the current disjointed header + stats layout with this redesigned structure.

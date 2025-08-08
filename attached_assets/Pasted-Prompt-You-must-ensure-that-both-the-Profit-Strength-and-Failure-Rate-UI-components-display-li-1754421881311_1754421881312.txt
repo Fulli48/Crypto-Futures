@@ -1,0 +1,29 @@
+Prompt:
+
+You must ensure that both the “Profit Strength” and “Failure Rate” UI components display live, accurate, database-backed statistics by calculating their values directly from the tradeSimulations table, not from UI state or local cache.
+	1.	Data Source:
+ • All calculations must use the tradeSimulations table as the source of truth, utilizing these key fields: actualOutcome, successScore, profitLoss, timeInProfitRatio.
+ • Only include trades with outcomes TP_HIT, SL_HIT, or EXPIRED; exclude trades in progress.
+	2.	Profit Strength Calculation:
+ • Definition: The percent of completed trades that hit Take Profit (actualOutcome === “TP_HIT”).
+ • Formula:
+  profitStrength = (number of TP_HIT trades / total completed trades) * 100
+	3.	Failure Rate Calculation:
+ • Definition: The percent of completed trades that hit Stop Loss (actualOutcome === “SL_HIT”).
+ • Formula:
+  failureRate = (number of SL_HIT trades / total completed trades) * 100
+	4.	Stats API/Backend:
+ • If a stats endpoint/component already exists that can supply these numbers, connect the UI components to it.
+ • Otherwise, implement a backend endpoint (e.g., /api/tradeStats?window=24h) that:
+  - Accepts a window (24h, 7d, or all-time)
+  - Queries tradeSimulations for that window
+  - Returns JSON: { profitStrength, failureRate, sampleSize } as percentages and total trade count
+ • Use efficient DB querying—filter by createdAt and actualOutcome in [“TP_HIT”, “SL_HIT”, “EXPIRED”].
+	5.	Frontend Integration:
+ • Update the Profit Strength and Failure Rate components to fetch these stats from the backend endpoint using SWR, React Query, or similar, auto-refreshing at least every 30s.
+ • Show loading state and handle errors gracefully.
+ • Optionally allow users to select stats window (24h, 7d, all-time).
+ • Display total sample size as context if space allows.
+	6.	Testing/Verification:
+ • Test with both real and edge case data (e.g., no trades, all SL_HIT, all TP_HIT, mix).
+ • Manually verify frontend values against a DB query to ensure correctness

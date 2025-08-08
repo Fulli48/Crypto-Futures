@@ -1,0 +1,70 @@
+### ML Confidence Calculation – Tuned Adjustments
+
+1. **Performance Multiplier (Smoothing & Clipping):**
+   - Update the multiplier formula to use a smoothed moving average for recent trades, and apply a narrower, safer range:
+     ```js
+     // Use EMA of recent success rates, not raw last value
+     const smoothedSuccessRate = calculateEMA(this.performanceMetrics.recentSuccessRates, 0.15); // smoothing alpha
+     const performanceMultiplier = Math.max(0.85, Math.min(1.2, smoothedSuccessRate * 1.5));
+     ```
+     - Ensure `recentSuccessRates` is an array of last 50 (or more) outcomes.
+
+2. **Signal-Specific Multiplier (Single-Source Only):**
+   - Apply either the overall or signal-specific multiplier, not both together. Prefer the one matching the trade’s direction:
+     ```js
+     let directionMultiplier = performanceMultiplier;
+     if (signal === 'LONG') {
+       const longRate = calculateEMA(this.performanceMetrics.longSuccessRates, 0.15);
+       directionMultiplier = Math.max(0.85, Math.min(1.2, longRate * 1.5));
+     } else if (signal === 'SHORT') {
+       const shortRate = calculateEMA(this.performanceMetrics.shortSuccessRates, 0.15);
+       directionMultiplier = Math.max(0.85, Math.min(1.2, shortRate * 1.5));
+     }
+     ```
+
+3. **Learning Bonus (Minimal & Decaying):**
+   - Reduce bonus cap and apply decay as cycles increase:
+     ```js
+     let learningBonus = 0;
+     if (this.trainingCycle > 10) {
+       learningBonus = Math.min(0.05, 0.02 + (0.01 * Math.exp(-0.07 * (this.trainingCycle - 10))));
+     }
+     ```
+
+4. **Adaptive Threshold Filtering (Floor + Smoothing):**
+   - When filtering, set a hard minimum to avoid locking out all signals, and use a rolling mean/std:
+     ```js
+     const buffer = this.recentPredictions.slice(-50);
+     const avg = mean(buffer);
+     const stddev = std(buffer);
+     const dynamicThreshold = Math.max(0.38, avg - (0.5 * stddev));
+     // Always allow signals >= dynamicThreshold, but never less than 38%
+     ```
+
+5. **Confidence Capping (Realistic but Not Overly Restrictive):**
+   - Allow full range up to 95% if justified, but calibrate upper limit to historical best trades.
+     ```js
+     finalConfidence = Math.min(95, Math.max(20, calculatedConfidence));
+     ```
+
+6. **UI Feedback for No Signals:**
+   - If no signal meets threshold, ensure UI displays:  
+     "No high-quality trade signals available right now. The system is monitoring and will alert you when a strong opportunity appears."
+
+7. **Model Validation (Regular Rolling Validation):**
+   - After every 20 new trades, trigger a rolling validation step (hold out recent trades, report on precision/recall/F1).
+   - Log validation stats to a dedicated table or console.
+
+8. **Code Comments/Instructions:**
+   - Replace previous multiplier, bonus, and threshold logic with the updated snippets above.
+   - Ensure all means/EMAs use up-to-date, well-sized rolling windows.
+   - All calculated confidences must pass through capping before UI or storage.
+
+---
+
+**Summary**:  
+Apply exponential smoothing to success rates, limit all multipliers and learning bonuses to safe ranges, enforce a hard minimum threshold for signal display, and provide user feedback when no trades are shown. Regularly validate and log model performance.
+
+---
+
+> *Copy this block to your code agent. Implement each code snippet and instruction as described for an improved, safer, and user-friendly ML confidence system in your crypto trading engine.*

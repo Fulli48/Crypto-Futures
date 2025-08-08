@@ -1,0 +1,57 @@
+Refactor the two action buttons under the stat section (“View Chart Data” and “Learning System”) with the following exact changes:
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+🎯 PURPOSE:
+- Make the buttons look professional, properly spaced, and icon-free.
+- DO NOT change any global styles or alter other elements.
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+🎛️ BUTTON LAYOUT (FLEX ROW):
+
+1. Place both buttons inside a Flex container with these properties:
+   • `display: flex`
+   • `justify-content: center`
+   • `align-items: center`
+   • `gap: 1rem`
+   • `flex-wrap: wrap` (so buttons can wrap on smaller screens)
+
+2. Ensure buttons appear **side-by-side horizontally** on all desktop/tablet screen sizes.
+   • DO NOT allow vertical stacking unless screen width < 600px
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+📏 BUTTON SIZE & STYLE:
+
+3. Adjust size and spacing for clean, modern proportions:
+   • `padding: 0.5rem 1.2rem`
+   • `font-size: 0.95rem`
+   • `min-width: 140px`
+   • `text-align: center`
+   • `height: auto` (let content dictate height)
+
+4. Keep visual theme consistent:
+   • Maintain gradient background (e.g., linear purple/blue)
+   • Keep outer glow or hover shadow effects
+   • Keep pill shape (`border-radius: 999px`)
+   • Keep text color white
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+🚫 ICON REMOVAL:
+
+5. Remove all emojis or decorative icons from the buttons.
+   • Delete 📊 from “View Chart Data”
+   • Delete ⚡ from “Learning System”
+   • Final button labels should be:
+     → `View Chart Data`
+     → `Learning System`
+
+   These buttons should now be clean, modern, and minimal — no prefixes or emojis.
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+✅ END RESULT:
+
+• Two clean, side-by-side buttons that match the app’s modern design
+• No emojis or icons in button labels
+• Proper padding, width, and alignment
+• Responsive layout that wraps only when needed
+
+Do not modify any unrelated components or existing visual styles. Apply these updates only to the buttons within the “Cryptocurrency Trading Intelligence” section.

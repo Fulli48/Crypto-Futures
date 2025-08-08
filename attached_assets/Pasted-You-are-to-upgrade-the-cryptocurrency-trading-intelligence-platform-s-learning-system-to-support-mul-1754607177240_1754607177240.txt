@@ -1,0 +1,144 @@
+You are to upgrade the cryptocurrency trading intelligence platform’s learning system to support multi-horizon, per-minute forecast accuracy tracking and use it in trade creation. Follow these steps in exact order, integrating with the current codebase (self-improving-ml-engine.ts, ml-trade-signal-engine.ts, ensemble-meta-learner.ts, rolling-chart-service.ts, database models, and trade creation routes). Maintain backward compatibility with all existing components.
+
+====================
+1. DATABASE CHANGES
+====================
+- Add new table: forecast_accuracy_history
+  Columns:
+    id (uuid, PK),
+    symbol (string, indexed),
+    forecast_timestamp (datetime, indexed),
+    horizon_minute (int), -- 1 to 20
+    predicted_price (float),
+    actual_price (float),
+    direction_correct (boolean),
+    absolute_error_pct (float),
+    regime (enum: TREND_UP, TREND_DOWN, SIDEWAYS),
+    base_model (string), -- LSTM, ARIMA, GBoost, Ridge, etc.
+    created_at (datetime default now)
+- Add table: horizon_feature_weights
+  Columns:
+    id (uuid, PK),
+    symbol (string, indexed),
+    horizon_range (string, e.g. '1-5', '6-12', '13-20'),
+    feature_name (string),
+    weight_value (float),
+    updated_at (datetime default now)
+- Add table: regime_model_scores
+  Columns:
+    id (uuid, PK),
+    symbol (string, indexed),
+    regime (string),
+    base_model (string),
+    horizon_minute (int),
+    accuracy (float),
+    updated_at (datetime default now)
+
+=========================
+2. FORECAST TRACKING LOGIC
+=========================
+In ml-forecast-engine.ts:
+- After generating the 20-minute forecast for each symbol:
+  - Persist forecasted prices to DB (forecast_accuracy_history) with horizon_minute and base_model name.
+- Create worker: forecast-accuracy-updater.ts
+  - Every minute, check for forecasts that have "actual price" missing but horizon window has passed.
+  - Fetch the actual close price for that horizon from rolling_chart_service data.
+  - Calculate:
+      direction_correct = sign(predicted_price - price_at_forecast_start) == sign(actual_price - price_at_forecast_start)
+      absolute_error_pct = abs(actual_price - predicted_price) / predicted_price * 100
+      regime = detectRegime(last_20min_chart_data) 
+        (if EMA slope > threshold → TREND_UP, < -threshold → TREND_DOWN, else SIDEWAYS)
+  - Store actual_price, direction_correct, absolute_error_pct, and regime in DB.
+
+=====================
+3. MULTI-HORIZON LEARNING
+=====================
+In self-improving-ml-engine.ts:
+- Create separate weight sets for:
+    horizon_1_5
+    horizon_6_12
+    horizon_13_20
+- After trade completion:
+  - Pull last N forecasts for that symbol and group by horizon range.
+  - Calculate mean accuracy for each feature within that horizon range.
+  - Update horizon_feature_weights table accordingly.
+  - Apply higher weight adjustments to features with higher correlation to accuracy in that horizon range.
+
+=====================
+4. REGIME-SPECIFIC MEMORY
+=====================
+- Store forecast accuracy per regime in regime_model_scores.
+- In ensemble-meta-learner.ts:
+  - Before combining base models, detect current regime from latest chart data.
+  - Prefer base models with higher regime-specific + horizon-specific accuracy for weighting.
+
+=====================
+5. META-LEARNER UPGRADE
+=====================
+- Expand meta-learner input features to include:
+    - horizon-specific accuracy scores (from DB)
+    - regime classification
+    - forecast confidence decay curve per horizon
+- Allow meta-learner to output different weights for base models depending on horizon.
+
+=====================
+6. TRADE CREATION ADJUSTMENT
+=====================
+In enhanced-trading-engine.ts:
+- Modify shouldCreateTradeWithSuccessScore to:
+    - Use adjusted_confidence = (short_term_acc × 0.5) + (mid_term_acc × 0.3) + (long_term_acc × 0.2)
+    - If long-term horizon accuracy is poor but short-term is high, adjust TP/SL for quicker exit.
+    - If all horizons are strong, keep normal TP/SL.
+
+=====================
+7. CONTINUOUS ONLINE TRAINING
+=====================
+- After each forecast finishes its 20-minute window:
+  - Update per-horizon accuracy
+  - Update regime_model_scores
+  - Refresh feature weights
+- Implement lightweight incremental learning (partial_fit for models that support it) so retraining is continuous without downtime.
+
+=====================
+8. VISUALIZATION BUTTON
+=====================
+In UI:
+- Add "Forecast Accuracy" button next to each symbol.
+- On click:
+  - Display chart with:
+      - Actual price (solid green)
+      - Predicted price paths from each base model (dotted lines)
+      - Horizon-specific accuracy annotations
+  - Show per-horizon and per-regime accuracy metrics.
+
+=====================
+9. QUALITY GATES
+=====================
+- Before approving trade:
+  - Require ≥ X% accuracy for at least one horizon range relevant to TP/SL target.
+  - Reject trades where regime accuracy for all models < threshold.
+
+=====================
+10. TESTING & VALIDATION
+=====================
+- Backtest on last 7 days of data per symbol, logging:
+    - Overall forecast accuracy
+    - Horizon-specific accuracy
+    - Regime classification accuracy
+    - Trade P&L vs old system
+- Optimize feature weights and thresholds based on results.
+
+=====================
+11. PERFORMANCE OPTIMIZATION
+=====================
+- Index DB columns on symbol, forecast_timestamp, horizon_minute.
+- Use in-memory cache for regime_model_scores and horizon_feature_weights for low-latency trade decisions.
+
+=====================
+GOAL
+=====================
+When completed, the system must:
+- Track minute-by-minute forecast accuracy
+- Learn which models/features work best for short/mid/long horizons
+- Adapt trade decisions dynamically to horizon and regime performance
+- Continuously improve with each forecast cycle

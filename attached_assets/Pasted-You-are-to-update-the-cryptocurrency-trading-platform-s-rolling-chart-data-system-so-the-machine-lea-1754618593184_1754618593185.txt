@@ -1,0 +1,191 @@
+You are to update the cryptocurrency trading platform’s rolling chart data system so the machine learning forecast engine always has a clean, accurate 600-minute historical dataset per symbol, with complete technical indicators and no abnormal values. Implement ALL of the following changes in code:
+
+1. DATABASE SCHEMA MIGRATION
+- Add columns:
+  - source TEXT DEFAULT 'BINANCE' (values: 'BINANCE', 'FALLBACK', 'BINANCE_BACKFILL')
+  - hasMissingData BOOLEAN DEFAULT FALSE
+  - isComplete BOOLEAN DEFAULT TRUE
+- Add unique constraint: (symbol, timestamp)
+- Add composite index: (symbol, timestamp)
+- Ensure volume stored in BASE ASSET units
+Migration:
+```ts
+await db.execute(`
+    ALTER TABLE rolling_chart_data
+    ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'BINANCE',
+    ADD COLUMN IF NOT EXISTS hasMissingData BOOLEAN DEFAULT FALSE,
+    ADD COLUMN IF NOT EXISTS isComplete BOOLEAN DEFAULT TRUE;
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_symbol_timestamp ON rolling_chart_data(symbol, timestamp);
+`);
+STRICT INGESTION
+
+Align to Binance 1-minute close time
+
+Primary fetch from Binance; if fails, fetch fallback, normalize volume to Binance units
+
+Do not insert if existing record is complete
+
+Calculate indicators immediately and mark isComplete=true
+
+Skip partial candles and duplicates
+
+BACKFILL LOGIC
+
+Only fill missing or incomplete timestamps
+
+Always fetch Binance data for backfill
+
+Mark as source='BINANCE_BACKFILL'
+
+Never overwrite valid isComplete=true rows
+
+Recalculate indicators for each backfilled row
+
+ANOMALY DETECTION & DUPLICATE REMOVAL
+
+Flag rows where volume > avg + (3×stddev) for symbol; set hasMissingData=true
+
+Delete duplicate rows (same symbol & timestamp, keep latest)
+
+After cleanup, recalculate indicators for all affected timestamps
+
+AUTOMATIC TECHNICAL INDICATOR REBUILD
+
+Create function rebuildIndicators(symbol, timestamps[])
+
+For each timestamp flagged or backfilled, reload its OHLCV from DB, recalculate:
+
+RSI (14)
+
+MACD (12,26,9)
+
+Bollinger Bands (20, 2 stddev)
+
+Stochastic %K/%D
+
+Volatility (1m, 5m, 15m, 60m)
+
+Update DB row with recalculated indicators and set isComplete=true
+
+ML FORECAST LEARNING INTEGRATION
+
+Modify ML data loader to exclude:
+
+Rows with hasMissingData=true
+
+Rows with isComplete=false
+
+Include source in training data so model can detect fallback bias
+
+Ensure rolling 600-minute dataset is fully aligned and complete before prediction
+
+Trigger model retraining if >5% of last 600 rows replaced in backfill
+
+CODE IMPLEMENTATION
+
+ts
+Copy
+Edit
+import { db } from './db';
+import { rollingChartData } from './schema';
+import { getBinanceKlines, getFallbackKlines, normalizeFallbackVolume } from './api-clients';
+import { calculateIndicators } from './technical-indicators-service';
+import { eq, and } from 'drizzle-orm';
+
+export async function ingestMinute(symbol) {
+    const now = new Date();
+    now.setSeconds(0,0);
+    const ts = new Date(now.getTime() - 60*1000);
+
+    let candle;
+    try {
+        candle = await getBinanceKlines(symbol, ts);
+        candle.source = 'BINANCE';
+    } catch {
+        candle = await getFallbackKlines(symbol, ts);
+        candle.volume = normalizeFallbackVolume(candle.volume);
+        candle.source = 'FALLBACK';
+    }
+
+    const existing = await db.select().from(rollingChartData)
+        .where(and(eq(rollingChartData.symbol, symbol), eq(rollingChartData.timestamp, ts)));
+
+    if (existing.length && existing[0].isComplete) return;
+
+    const indicators = await calculateIndicators(symbol, candle);
+
+    await db.insert(rollingChartData).values({
+        symbol, timestamp: ts, open: candle.open, high: candle.high,
+        low: candle.low, close: candle.close, volume: candle.volume,
+        ...indicators, source: candle.source, isComplete: true, hasMissingData: false
+    }).onConflictDoNothing();
+}
+
+export async function backfill(symbol, startTime, endTime) {
+    const candles = await getBinanceKlines(symbol, startTime, endTime);
+    for (const candle of candles) {
+        const existing = await db.select().from(rollingChartData)
+            .where(and(eq(rollingChartData.symbol, symbol), eq(rollingChartData.timestamp, candle.timestamp)));
+        if (!existing.length || !existing[0].isComplete) {
+            const indicators = await calculateIndicators(symbol, candle);
+            await db.insert(rollingChartData).values({
+                symbol, timestamp: candle.timestamp, open: candle.open, high: candle.high,
+                low: candle.low, close: candle.close, volume: candle.volume,
+                ...indicators, source: 'BINANCE_BACKFILL', isComplete: true, hasMissingData: false
+            }).onConflictDoNothing();
+        }
+    }
+}
+
+export async function cleanAndFlagAnomalies(symbol) {
+    await db.execute(`
+        UPDATE rolling_chart_data
+        SET hasMissingData = TRUE
+        WHERE symbol = $1
+        AND volume > (
+            SELECT AVG(volume) + 3 * STDDEV(volume)
+            FROM rolling_chart_data WHERE symbol = $1
+        )
+    `,[symbol]);
+
+    await db.execute(`
+        DELETE FROM rolling_chart_data a
+        USING rolling_chart_data b
+        WHERE a.ctid < b.ctid
+        AND a.symbol = b.symbol
+        AND a.timestamp = b.timestamp
+    `);
+
+    const affected = await db.select({timestamp: rollingChartData.timestamp})
+        .from(rollingChartData)
+        .where(and(eq(rollingChartData.symbol, symbol), eq(rollingChartData.hasMissingData, true)));
+
+    await rebuildIndicators(symbol, affected.map(r => r.timestamp));
+}
+
+export async function rebuildIndicators(symbol, timestamps) {
+    for (const ts of timestamps) {
+        const row = await db.select().from(rollingChartData)
+            .where(and(eq(rollingChartData.symbol, symbol), eq(rollingChartData.timestamp, ts)));
+        if (!row.length) continue;
+        const indicators = await calculateIndicators(symbol, row[0]);
+        await db.update(rollingChartData)
+            .set({...indicators, isComplete: true, hasMissingData: false})
+            .where(and(eq(rollingChartData.symbol, symbol), eq(rollingChartData.timestamp, ts)));
+    }
+}
+SCHEDULE
+
+ingestMinute every 1 minute per symbol
+
+backfill hourly for past 2 hours
+
+cleanAndFlagAnomalies daily
+
+rebuildIndicators triggered automatically after anomaly cleaning or backfill
+
+Deliverable: Fully deployed ingestion + cleaning + indicator rebuild system so ML always trains on perfectly clean, complete rolling 600-minute historical data per symbol.
+
+pgsql
+Copy
+Edit

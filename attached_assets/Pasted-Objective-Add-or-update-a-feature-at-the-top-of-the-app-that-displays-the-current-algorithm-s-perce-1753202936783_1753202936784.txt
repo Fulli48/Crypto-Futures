@@ -1,0 +1,43 @@
+Objective:
+Add or update a feature at the top of the app that displays the current algorithm’s percent success rate and its improvement over the previous version, with robust, real-world success criteria. Ensure all calculations and UI elements follow the guidelines below.
+
+⸻
+
+1. Simulation Success Definition
+
+For every simulated trade (regardless of duration or type), count it as a “success” only if BOTH of the following are true:
+	•	A. Net Profit:
+The trade ends with net profit after all costs (fees, slippage, etc.)—whether it closed at the planned time or hit an early exit (TP/SL).
+	•	B. Time in Profit:
+During the lifetime of the trade, it spent at least a “reasonable” percentage of its duration in a profitable window, meaning it could have been closed early for profit at those moments.
+	•	For each simulation, count how many time steps/candles/minutes the trade could have closed at a profit.
+	•	Calculate:
+percent_in_profit = (number of profitable points during trade / total duration points) * 100
+	•	Only count as a “success” if percent_in_profit is at least your threshold (e.g., 30%).
+	•	(Optional) Drawdown Guard:
+Optionally, ignore trades as “successes” if they experienced a drawdown greater than a chosen threshold (e.g., -5%) at any point, even if they recovered.
+
+⸻
+
+2. Success Rate Calculation
+	•	Current Algorithm Success Rate:
+success_rate = (number of successful simulations / total simulations) * 100
+	•	This rate must be calculated using the success definition above, including both net profit and minimum time-in-profit window.
+
+⸻
+
+3. Version Improvement Calculation
+	•	Store and load the last (previous algorithm version’s) calculated success rate using the same logic.
+	•	Percent improvement:
+improvement_percent = ((current_success_rate - previous_success_rate) / previous_success_rate) * 100
+
+⸻
+
+4. UI Display Requirements
+	•	At the top of the app, always display:
+	•	Algorithm Success Rate: [current_success_rate]%
+	•	Directly below:
+↑ [improvement_percent]% from last version (color-coded green if positive, red if negative)
+	•	Use a tooltip or note on hover, or a “?” icon, explaining that a “success” means both a profitable close and a reasonable amount of time available to close in profit (using the percentage threshold set).
+	•	If possible, show the threshold used (e.g., “Success = profit + ≥30% time in profit”).
+	•	Optionally, display the count of successful/total trades for transparency.

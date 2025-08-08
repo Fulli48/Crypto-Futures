@@ -1,0 +1,120 @@
+INSTRUCTION BLOCK FOR ULTRA-ACCURATE TRADE SIGNAL SUGGESTION REFINEMENT:
+
+Refactor and extend the trade suggestion module to maximize trade accuracy and minimize false signals by implementing the following advanced signal filtering, validation, and adaptive consensus logic for every coin, on every forecast cycle:
+
+Ensemble Model and Dispersion Validation:
+
+For each coin, at each minute, gather all 20-minute-ahead forecasts from all trained models (LSTM, GRU/TCN, XGBoost, baseline/statistical).
+
+Compute, for each future minute, the standard deviation and range (“dispersion”) across model forecasts.
+
+Require that the ensemble consensus (mean absolute dispersion) for every predicted minute is less than or equal to a dynamic threshold, set as 1× the rolling 20-minute volatility for that coin.
+
+If this threshold is breached at any forecast point, set the signal to WAIT and flag “model disagreement” as the reason.
+
+Dynamic, Volatility-Scaled Signal Thresholds:
+
+Instead of static forecast-return thresholds, for every cycle, set the minimum required projected move (forecast_return = abs(forecasted f20 – current_price) / current_price) to at least 1.2× the rolling 20-min standard deviation of returns, rounded up to the nearest 0.05%.
+
+If the predicted move does not exceed this dynamic threshold, or if the projected move is less than the estimated round-trip fees plus 1× slippage, default to WAIT.
+
+Path Consistency and Smoothness Filter:
+
+Calculate the number of monotonic forecast steps (where each point is above/below the previous for LONG/SHORT).
+
+Require that at least 85% of steps in the 20-min forecast path are in the trade direction.
+
+If path oscillates or “chops” (e.g., up/down flips >3× in the path), treat as indecisive and set to WAIT.
+
+Technical Indicator Multi-Check:
+
+For all candidate LONG signals, require:
+
+RSI is between 40 and 70 and trending up over last 5 mins
+
+MACD is positive, and MACD line is above signal line
+
+Stoch K > Stoch D, and both above 40
+
+Price is above its 20-min moving average or breaking above BB upper band
+
+For SHORT signals, require the opposite (RSI 30–60 trending down, MACD negative and below signal, Stoch K < Stoch D below 60, price below MA or breaking below BB lower band).
+
+If any of these technicals are in conflict (e.g., MACD not bullish on a LONG), set a warning and lower the confidence score by 25%. If two or more are in conflict, set to WAIT.
+
+Risk/Reward and Trade Quality Enforcement:
+
+For every trade candidate, compute the projected reward/risk ratio as (take_profit – entry)/(entry – stop_loss) (or vice versa for SHORT).
+
+Require this ratio to be at least 2.0 after accounting for estimated fees and slippage.
+
+Position size must not risk more than 0.5% of account capital per trade.
+
+If these constraints cannot be met, default to WAIT and log reason.
+
+Order Book and Liquidity Checks:
+
+For the proposed position size, ensure that the rolling average volume and order book depth over the last 10 minutes is at least 5× larger than the required trade size.
+
+If not, reduce position size or set to WAIT and note “liquidity insufficient.”
+
+Cross-Market Consensus Filter:
+
+Before finalizing a signal, check the direction of highly correlated coins (e.g., for BTC, check ETH and SOL; for ADA, check XRP and similar).
+
+If >50% of correlated assets’ forecasts disagree in direction, reduce confidence by 30%. If all disagree, set to WAIT.
+
+If all are in consensus, boost confidence by 10%.
+
+Volatility and News Spike Detection:
+
+Monitor for sudden spikes in volume, buy/sell imbalance, or price outside 3× rolling ATR.
+
+If detected, suppress signals for 2–5 minutes and set to WAIT, log “volatility spike/news filter.”
+
+Ensemble Agreement and Meta-Modeling:
+
+Use a secondary meta-classifier (logistic regression, XGBoost, or neural net) trained on historical signal outcomes to estimate the “realized win rate” probability of current signal conditions.
+
+Only issue a trade signal if the meta-model’s predicted win rate is above 65%, else set to WAIT.
+
+Log all meta-model features and predictions for ongoing learning.
+
+Signal Quality Scoring and UI Transparency:
+
+For each issued signal, calculate a composite signal quality score out of 100%, based on:
+
+Model agreement (30%),
+
+Technical confluence (25%),
+
+Risk/reward (20%),
+
+Cross-market consensus (15%),
+
+Meta-model win rate (10%).
+
+Color code the signal in the UI:
+
+90–100%: green/“prime”
+
+70–89%: blue/“good”
+
+50–69%: yellow/“caution”
+
+Below 50%: no trade/WAIT
+
+Display all factors, confidence adjustments, and any warnings directly on the suggestion card.
+
+Trade Logging and Continuous Live Learning:
+
+For every trade, store all input features, decision variables, forecasts, confidence, warnings, and realized trade outcome.
+
+Continuously update rolling hit rates and feature importances, using this feedback to auto-adjust filter parameters and model weights every hour.
+
+Fail-Safe and Default to WAIT:
+
+If any data quality checks, consensus, technical checks, risk or liquidity requirements fail, default the signal to WAIT, and always log the exact reason for audit.
+
+Result:
+Every trade suggestion will only be issued when there is overwhelming multi-model, multi-filter, multi-market, and statistical confirmation; risk is strictly controlled; and full transparency is available in the UI for both live users and automated review. No ambiguous or low-confidence trades should ever be issued. All logic, parameters, weights, and outputs should be tracked, documented, and available for rapid improvement.

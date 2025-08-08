@@ -1,0 +1,50 @@
+Update the trade completion and failure logic to better reflect realistic user experience. Implement the following logic everywhere trades are evaluated:
+	1.	For each simulated trade, track price action at each interval (preferably minute-by-minute) during the 20-minute window.
+	2.	For LONG trades:
+
+	•	If price >= takeProfit at any interval, actualOutcome = “TP_HIT”
+	•	If price <= stopLoss at any interval, actualOutcome = “SL_HIT”
+	•	Otherwise, count how many intervals price >= entryPrice * (1 + MIN_PROFIT_THRESHOLD), where MIN_PROFIT_THRESHOLD is 0.001 (0.1%)
+	•	If the trade spends at least MIN_PROFIT_TIME (set MIN_PROFIT_TIME = 2 minutes) above this profit threshold, actualOutcome = “PULLOUT_PROFIT”
+	•	If not, actualOutcome = “NO_PROFIT”
+
+	3.	For SHORT trades:
+
+	•	If price <= takeProfit at any interval, actualOutcome = “TP_HIT”
+	•	If price >= stopLoss at any interval, actualOutcome = “SL_HIT”
+	•	Otherwise, count how many intervals price <= entryPrice * (1 - MIN_PROFIT_THRESHOLD)
+	•	If trade spends at least MIN_PROFIT_TIME (2 minutes) below this profit threshold, actualOutcome = “PULLOUT_PROFIT”
+	•	If not, actualOutcome = “NO_PROFIT”
+
+	4.	Set these configuration constants at the top of your trade evaluation module:
+
+	•	MIN_PROFIT_TIME = 2 // minutes (comfortable window for pullout opportunity)
+	•	MIN_PROFIT_THRESHOLD = 0.001 // 0.1% profit
+
+	5.	For reporting and dashboard stats:
+
+	•	Success = TP_HIT + PULLOUT_PROFIT
+	•	Failure = SL_HIT + NO_PROFIT
+	•	Failure rate = (Failures) / (Total Completed Trades) * 100
+
+	6.	Update all simulation, evaluation, and dashboard logic to use these outcomes and definitions.
+	7.	Example implementation:
+const MIN_PROFIT_TIME = 2; // minutes
+const MIN_PROFIT_THRESHOLD = 0.001; // 0.1% profit
+
+for each trade:
+let profitIntervals = 0;
+for each minute in the 20-minute window:
+if trade is LONG:
+if price >= takeProfit: outcome = “TP_HIT”; break;
+if price <= stopLoss: outcome = “SL_HIT”; break;
+if price >= entryPrice * (1 + MIN_PROFIT_THRESHOLD): profitIntervals += 1;
+if trade is SHORT:
+if price <= takeProfit: outcome = “TP_HIT”; break;
+if price >= stopLoss: outcome = “SL_HIT”; break;
+if price <= entryPrice * (1 - MIN_PROFIT_THRESHOLD): profitIntervals += 1;
+if not outcome:
+if profitIntervals >= MIN_PROFIT_TIME: outcome = “PULLOUT_PROFIT”;
+else outcome = “NO_PROFIT”;
+
+Update all code and analytics to use these new outcome definitions and verify results against real historical data.

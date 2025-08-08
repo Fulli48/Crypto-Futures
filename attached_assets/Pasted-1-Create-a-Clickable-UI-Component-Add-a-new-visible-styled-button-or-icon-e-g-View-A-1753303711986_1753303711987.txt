@@ -1,0 +1,31 @@
+1. **Create a Clickable UI Component:**
+   - Add a new visible, styled button or icon (e.g., “View All Trades”, a table icon, or similar) to the dashboard or relevant section.
+   - The component should have an obvious hover and click effect to indicate interactivity.
+   - Place the component where it’s easily accessible but not obtrusive, such as near the algorithm success rate metric or trade summary section.
+
+2. **Define Click Action:**
+   - When the component is clicked, open a **fullscreen modal/popup window** that overlays the entire app viewport (not a drawer, expandable panel, or partial window).
+   - The pop-up should prevent all interaction with the underlying UI until it is closed.
+
+3. **Display Trade Data in Pop-up:**
+   - Within the modal, display a scrollable data table or chart.
+   - Each row in the table represents one stored/completed trade.
+   - Each column displays a different trade data point (e.g., trade ID, timestamp, final P&L, time in profit, max drawdown, max favorable excursion, entry/exit prices, trade type, signal, etc.).
+   - The table should have a sticky header for column labels, and support vertical scrolling to access older trades (e.g., up to 500).
+   - Newest trades should appear at the top by default.
+   - Optionally, allow sorting by clicking column headers and provide horizontal scrolling for wide data sets.
+
+4. **Exit and Dismissal:**
+   - Place a prominent “X” (close) button in the top-right corner of the modal. 
+   - Clicking this button immediately closes the pop-up and returns the user to the main dashboard/view.
+   - Also allow closing the modal with the Escape key for better UX.
+
+5. **User Experience:**
+   - The modal should be responsive and work on all screen sizes, including mobile.
+   - No part of the background app should be clickable or scrollable when the modal is open.
+   - All data should be visible, and the layout should adapt to the available screen space.
+
+**Goal:**  
+Allow users to easily open a fullscreen pop-up from the dashboard to view all stored trade records in detail, in a scrollable, sortable table, and close the modal with a single click or the Escape key to return to the main view.
+
+**Implement all UI state logic, data fetching for trades, and modal open/close handling as part of this feature.**

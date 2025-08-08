@@ -1,0 +1,55 @@
+Detailed Steps:
+
+Audit and Identify Broken Components:
+
+Review all main UI component files (e.g., Dashboard.jsx, App.jsx, related components in /components).
+
+Check for recent accidental deletions, overwritten code, or unresolved merge conflicts.
+
+Reference Working Design:
+
+Use the provided screenshot as the reference for structure, section titles, metrics, buttons, and overall layout.
+
+Document the correct order of all sections, including headings, stats, tab/group layouts, and any conditional rendering.
+
+Manual Reconstruction Procedure:
+
+For every main section visible in the screenshot (e.g., “Expected Profit Strength,” “Rolling 500-Trade Window,” “AI Trade Suggestions,” “Dynamic Live ML System,” “Live Learning System”), reconstruct or repair the JSX code and ensure:
+
+The correct component structure and hierarchy is in place.
+
+All buttons (e.g., “View Chart Data,” “Learning System,” “Generate New Suggestions”) are present and properly labeled.
+
+Stat and metric displays are arranged in grids or flex layouts to match the screenshot.
+
+Tab or group components for “Live Generation,” “Pending Suggestions,” etc. are in the right order.
+
+Restore all CSS or styling logic:
+
+Check Dashboard.module.css, App.css, global styles, and component-specific styles for accidental changes or removals.
+
+Re-add missing classnames or style rules based on the design in the screenshot.
+
+Reconnect all props/state/data:
+
+Make sure metrics (system confidence, tracked symbols, active models, learning status, etc.) are correctly fetched and displayed.
+
+Fix any broken hooks or data mapping.
+
+Testing and Verification:
+
+After reconstructing, run the UI in preview.
+
+Verify every section matches the screenshot—position, label, style, color, and visibility.
+
+Test all UI controls (tabs, buttons, expandable groups) to ensure they show the correct content and are interactive.
+
+Console Error Check:
+
+Open the developer console in Replit preview and fix any rendering or runtime errors related to the dashboard components.
+
+Final Backup and Documentation:
+
+Once restored, save a local backup of the fixed files for safety.
+
+Optionally, document the main component structure for future fast recovery.

@@ -1,0 +1,134 @@
+You are to enhance the cryptocurrency trading intelligence system to include a fully integrated Per-Minute Forecast Learning, Visualization, and Reporting Loop that connects directly to the trade completion process, rolling chart database, and machine learning signal engines. Implement the following in exact order:
+
+=======================================
+1. FORECAST LEARNING DATA PIPELINE
+=======================================
+• Connect the trade completion worker (server/trade-completion-worker.ts) and forecast engine so that for every completed trade, the 20-minute forecast generated at trade entry is stored minute-by-minute in a new table `forecast_performance_data` with:
+  - trade_id (FK)
+  - symbol
+  - forecast_minute (1-20)
+  - predicted_price
+  - actual_price
+  - predicted_direction (UP/DOWN)
+  - actual_direction (UP/DOWN)
+  - correct_direction_flag (bool)
+  - abs_error (|predicted - actual|)
+  - market_regime_at_forecast (TREND_UP, TREND_DOWN, SIDEWAYS)
+  - market_regime_actual
+  - volatility_predicted
+  - volatility_actual
+  - timestamp
+
+• Implement weighted early-minute influence in the learning system:
+  - Minutes 1–5 get 2x learning weight
+  - Minutes 6–10 get 1.5x weight
+  - Minutes 11–20 get 1x weight
+
+• Track forecast drift:
+  - Maintain rolling average forecast error per symbol and per regime
+  - Adjust future forecasts with bias correction if persistent over/undershoot is detected
+
+• Maintain separate feature weight sets per market regime:
+  - Store RSI, MACD, volatility, etc., weights separately for TREND_UP, TREND_DOWN, SIDEWAYS
+  - Automatically detect regime at trade entry and apply corresponding weight set during signal generation
+
+=======================================
+2. UI & VISUALIZATION COMPONENTS
+=======================================
+Add a clickable button to the UI labeled “Forecast Accuracy” that opens a panel with:
+
+• Forecast vs Actual Line Chart:
+  - Overlay predicted vs actual prices minute-by-minute for the trade
+  - Color code correct (green) and incorrect (red) directional predictions
+
+• Per-Minute Accuracy Heatmap:
+  - Grid: rows = trades, columns = forecast minute (1–20)
+  - Cells: green if direction correct, red if wrong, intensity by error magnitude
+
+• Forecast Outcome Replay:
+  - Animation showing the forecast path vs actual path progressing minute by minute
+
+• Market Regime Overlay:
+  - Above charts, show detected forecast regime vs actual regime
+
+=======================================
+3. FORECAST QUALITY METRICS
+=======================================
+For each trade and in aggregated analytics, calculate:
+
+• Forecast Hit Rate by Minute:
+  - % of correct directional predictions for each minute (across all trades per symbol)
+
+• Early Accuracy Predictor (EAP):
+  - Accuracy of first 3 forecast minutes → adjust TP/SL dynamically if EAP < 50%
+
+• Forecast Volatility Alignment Score:
+  - Penalize if predicted volatility deviates >30% from actual in first 5 minutes
+
+• Directional Confidence Decay:
+  - If accuracy drops more than 15% from minutes 1–5 to minutes 16–20, flag trade for shorter duration in similar setups
+
+=======================================
+4. LEARNING SYSTEM INTEGRATION
+=======================================
+Integrate new forecast performance data into the ML learning loop:
+
+• Success/Failure Classification:
+  - SUCCESS: TP_HIT or PULLOUT_PROFIT outcomes
+  - FAILURE: SL_HIT or NO_PROFIT outcomes
+  - Exclude from learning if movement <0.1% or anomaly detected (>2% spike/drop in <1 min)
+
+• Forecast Accuracy Weight Adjustment:
+  - For each indicator weight, adjust proportional to forecast accuracy in its regime
+  - Example: If MACD accuracy in TREND_UP = 80% over last 20 trades, weight × 1.1; if <50%, weight × 0.9
+
+• Rolling Window Weight Adjustment:
+  - Apply changes based on last N=50 trades to avoid overfitting
+
+=======================================
+5. SAFETY NETS & ANOMALY FILTERING
+=======================================
+• Anomaly detection:
+  - Exclude trades from learning if:
+    a) abnormal volume spike (>3× average in <1 minute)
+    b) extreme slippage (>0.5% between forecast and actual in 1 minute)
+    c) missing >2 forecast minutes due to data gap
+
+• Low data exclusion:
+  - Skip regime-based weight adjustment if fewer than 10 trades exist for that regime
+
+=======================================
+6. DATABASE & BACKEND CHANGES
+=======================================
+• New table: forecast_performance_data (structure listed in Section 1)
+• Update tradeSimulations table to include:
+  - avg_forecast_accuracy
+  - early_accuracy_3min
+  - volatility_alignment_score
+  - drift_correction_applied (bool)
+
+• Update learningWeights table to store weights per regime:
+  - regime (TREND_UP, TREND_DOWN, SIDEWAYS) column added
+
+=======================================
+7. REPORTING DASHBOARD ADDITIONS
+=======================================
+• Aggregate Forecast Accuracy Report:
+  - Per symbol, per regime, per forecast minute hit rates
+  - Forecast confidence vs actual accuracy correlation graph
+
+• Regime-Specific Win Rates:
+  - Show TP/SL hit ratios separately for each regime
+
+• Forecast Error Trendline:
+  - Display rolling 50-trade avg forecast error per symbol
+
+=======================================
+IMPLEMENTATION NOTES
+=======================================
+• All calculations should be stored in DB and updated post-trade for persistence
+• UI should query API endpoints for per-trade and aggregated forecast performance data
+• Learning loop should run weight adjustment logic immediately after trade completion processing
+• Keep regime detection consistent across forecast generation and evaluation
+
+End result: The system will not only learn from whether a trade wins or loses, but exactly which forecast minutes were right or wrong, in which market regime, and by how much — feeding that directly back into per-symbol, per-regime indicator weights and improving forecast realism and trade selection over time.

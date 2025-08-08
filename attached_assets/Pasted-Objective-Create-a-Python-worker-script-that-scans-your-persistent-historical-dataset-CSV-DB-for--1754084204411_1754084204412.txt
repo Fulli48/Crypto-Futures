@@ -1,0 +1,93 @@
+Objective:
+Create a Python worker script that scans your persistent historical dataset (CSV/DB) for each symbol, and for every row with a missing, invalid, or obviously stale value for RSI, volatility, or volume, recalculates the correct value using a rolling window ending at that row, then writes the new value back. All calculations must be windowed and row-specific, never filled-forward or duplicated, and must correct “frozen” or stuck values.
+
+Instructions:
+
+Connect to Data
+
+Load data for each symbol as a DataFrame, sorted by ascending timestamp.
+
+Iterate Over Rows with Rolling Window
+
+For each row index i, if i >= N-1 (N = lookback, e.g. 14 for RSI):
+
+Slice the rolling window: window = df.iloc[i-N+1:i+1]
+
+Calculate RSI:
+
+Use this window’s closing prices.
+
+Calculate RSI for this window, assign result to row i.
+
+Calculate Volatility:
+
+Use this window’s closing prices or returns.
+
+Rolling standard deviation of returns or ATR over the window.
+
+Volume:
+
+Use raw volume for that minute; if missing, set as 0 or NaN.
+
+If any value is missing, stale, or obviously wrong (e.g. all same RSI for 100+ rows), force recalculation.
+
+Overwrite Bad Data
+
+If recalculated value differs from the stored value (or stored value is blank/stale), overwrite and update the row in the DB/file.
+
+Persist Results
+
+Save after each update, or in small batches, but guarantee disk/database persistence.
+
+Do not leave old, bad, or duplicated values.
+
+Test and Validate
+
+Print summary of changes: number of rows fixed, old vs. new values.
+
+Confirm in the output that RSI, volatility, and volume vary over time as expected.
+
+Pseudocode Outline:
+
+python
+Copy
+Edit
+import pandas as pd
+import numpy as np
+
+N = 14  # window size
+
+def calculate_rsi(window):
+    # Standard RSI logic (price diff, avg gain/loss, etc.)
+    # Return float or np.nan
+    pass
+
+def calculate_volatility(window):
+    # stddev of price returns, or ATR
+    pass
+
+def worker(symbol, file):
+    df = pd.read_csv(file)
+    for i in range(N-1, len(df)):
+        window = df.iloc[i-N+1:i+1]
+        # Calculate RSI for this window
+        rsi = calculate_rsi(window['price'])
+        if (pd.isnull(df.at[i, 'RSI']) or df.at[i, 'RSI'] in ["N/A", ""] or stale_value(df['RSI'])):
+            df.at[i, 'RSI'] = rsi
+        # Calculate Volatility
+        vol = calculate_volatility(window['price'])
+        if (pd.isnull(df.at[i, 'volatility']) or df.at[i, 'volatility'] in ["N/A", ""] or stale_value(df['volatility'])):
+            df.at[i, 'volatility'] = vol
+        # Volume
+        if pd.isnull(df.at[i, 'volume']) or df.at[i, 'volume'] in ["N/A", ""]:
+            df.at[i, 'volume'] = window['volume'].iloc[-1]  # or 0/NaN if missing
+    df.to_csv(file, index=False)
+
+def stale_value(series):
+    # Returns True if value is obviously repeated for too many rows
+    return series.value_counts().max() > len(series) * 0.8
+
+worker('ETHUSDT', 'your_data.csv')
+Summary:
+The worker must recalculate RSI, volatility, and volume for each row using the appropriate rolling window. It must correct all bad, stuck, or stale values, and write back results for every row. The final output must show natural metric variation over time. Do not allow fill-forward, stuck values, or batch copying.
+

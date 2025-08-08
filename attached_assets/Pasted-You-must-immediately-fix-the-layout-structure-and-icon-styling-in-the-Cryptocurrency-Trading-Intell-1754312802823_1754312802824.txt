@@ -1,0 +1,52 @@
+You must immediately fix the layout structure and icon styling in the "Cryptocurrency Trading Intelligence" section. The previous attempt incorrectly:
+
+1. Stacked the stat cards vertically — they must be horizontal.
+2. Used the wrong brain icon (a detailed emoji) — it must use the original white outline brain icon already used in the app.
+
+DO NOT alter visual styling, color palette, padding, or button format from the existing theme. Only fix the layout and icon behavior as described below.
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––
+📐 REQUIRED LAYOUT (FLEX-BASED, DESKTOP DEFAULT):
+
+The stat section must be a **horizontal 3-part layout** using Flexbox:
+
+| [Stat Block: Expected Profit Strength] | [Brain Icon] | [Stat Block: Trade Failure Rate] |
+
+- Flex direction: `row`
+- Justify content: `space-around` or `center` with fixed spacing
+- Align items: `center`
+- Min-width for each stat block: 140px
+- No line breaks between blocks unless viewport is narrow
+
+DO NOT stack these stat blocks vertically on desktop. Stacking is allowed **only under 600px width** (mobile breakpoint).
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––
+🧠 ICON REQUIREMENT:
+
+Use the **white outline brain icon** that already exists in the current design system. This may be a vector image, SVG, or font-based icon (NOT the colored emoji 🧠).
+
+- The icon should sit centered *between* the two stat blocks — use margin or padding if needed.
+- Size: approximately `font-size: 1.6rem–2rem`
+- Center vertically relative to the stat cards
+
+If you are unsure which icon to use, locate the white brain icon currently used in the “Learning System Analytics & Controls” header and use the exact same one here.
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––
+📱 MOBILE BEHAVIOR:
+
+Only when the screen width is under 600px:
+- Stack the left stat, then the brain icon, then the right stat
+- Allow buttons to wrap or stack vertically
+
+This responsive behavior must be handled via media queries (`@media max-width: 600px`) or responsive utility classes.
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––
+✅ FINAL VISUAL RESULT:
+
+- Stat blocks must appear side-by-side horizontally on desktop/tablet
+- Brain icon must be centered between them, not off to the side
+- Icon must match the white outlined brain used elsewhere in the app
+- Header, stat row, and buttons should all be inside one visually unified card
+- No loss of existing styling (fonts, colors, borders, glow, buttons)
+
+Replace the currently broken vertical structure with this corrected layout immediately. If you need to verify spacing visually, center the full container horizontally and inspect gaps between the stat blocks to ensure symmetry.

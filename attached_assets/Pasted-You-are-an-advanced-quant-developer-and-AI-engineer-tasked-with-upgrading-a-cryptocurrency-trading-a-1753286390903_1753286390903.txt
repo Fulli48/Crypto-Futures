@@ -1,0 +1,44 @@
+You are an advanced quant developer and AI engineer tasked with upgrading a cryptocurrency trading application.  
+The application already has a comprehensive trade simulation learning system and stores extensive historical simulation and trade data.
+
+**Your goal is to:**
+- Transition the entire backend and frontend stack so that ALL components responsible for generating or displaying trade suggestions (including APIs, live dashboards, UIs, notification systems, etc.) utilize a new, machine-learning-based trade signal engine that is fully integrated with the existing trade simulation learning data.
+- Completely phase out use of the old, static/baseline algorithm for signal and confidence generation.
+
+**Instructions for Implementation:**
+
+1. **Centralize the ML Trade Signal Engine**
+    - Build a single, modular trade signal engine module/class/function that encapsulates all logic for generating trade signals (LONG/SHORT/WAIT) and their confidence/probabilities.
+    - This engine should:
+        - Pull features and labels directly from the current, unified simulation learning dataset.
+        - Use machine learning models (e.g., Random Forest, LSTM/GRU, or ensemble) trained on these features.
+        - Optionally support weighted model blending or dynamically adjusted parameters based on recent performance.
+        - Expose a clear, well-documented API (function or endpoint) for other components to call for trade suggestions.
+
+2. **Backend Integration**
+    - Refactor all backend functions, API endpoints, cron jobs, and logic that previously generated trade suggestions using the static/baseline algorithm to instead call the new ML-based signal engine.
+    - Ensure that all trade suggestion requests—whether triggered by live price changes, batch simulation, or user actions—now query this new engine for up-to-date, data-driven signals.
+    - Update documentation and internal comments to reference the new engine as the single source of signal truth.
+
+3. **Frontend/UI Updates**
+    - Refactor all UI/dashboard components (including any React, Vue, or vanilla JS frontends) that display trade suggestions, confidence levels, and related analytics to pull data exclusively from endpoints backed by the new learning algorithm.
+    - If any client-side logic was previously duplicating the baseline algorithm, remove it and ensure only backend-driven, ML-based signals are shown.
+    - Update all signal displays, tooltips, and confidence visualizations to reflect the model-driven outputs (including probability, model explanation, and optional feature importance/weights).
+
+4. **Code Modularity and API Design**
+    - Design the central trade signal engine to be extensible, allowing easy updates/retraining, addition of new features, or further model improvements.
+    - Ensure the engine is callable both synchronously and asynchronously (as needed) by any backend or frontend consumer.
+
+5. **Transition Plan and Testing**
+    - Provide clear documentation and migration instructions for all developers on how to switch from the old algorithm to the new engine.
+    - Implement a toggle or configuration setting (if needed) to allow phased migration or A/B testing.
+    - Ensure thorough unit/integration tests for all trade suggestion flows to validate that only the new learning-driven logic is used.
+
+**Constraints:**
+- No part of the system should continue to use the old static/baseline algorithm for generating or displaying trade suggestions.
+- All code, endpoints, and UI components must now reference the new ML-powered signal engine as their sole source for trade suggestions and confidence metrics.
+- Maintain clear and thorough inline documentation and architectural diagrams to illustrate the new data flow.
+
+**Goal:**  
+Produce all necessary backend and frontend code, API design, and migration documentation to achieve this switchover, using Python (for backend ML), and relevant technologies for your UI stack.  
+All logic should build directly on the existing trade simulation learning data and infrastructure, with no unnecessary duplication or re-creation of learning pipelines.

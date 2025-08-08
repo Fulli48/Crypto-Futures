@@ -1,0 +1,124 @@
+Detailed Steps to Generate Trade Suggestions from 20-Minute Forecasts
+
+Fetch Inputs for the Current Decision Cycle
+
+For each coin, at every minute, pull the following from your database:
+
+Latest 20-minute price forecast vector, as an array [f1, f2, ..., f20] (where f1 is forecasted close price for minute +1, f20 for minute +20).
+
+The current actual price (from your latest OHLCV row).
+
+The model’s forecast confidence score for this prediction.
+
+The timestamp associated with the forecast.
+
+Recent volatility, e.g. the standard deviation of price returns over the last 20 minutes.
+
+Current technical indicators: RSI, MACD, Stoch K, Stoch D, Bollinger Bands, etc.
+
+Compute Forecast-Based Price Change and Slope
+
+Calculate forecast_return = (f20 - current_price) / current_price.
+
+Calculate the average forecasted path slope: fit a linear regression to the 20-point forecast array, get the slope coefficient (can use numpy polyfit or similar).
+
+Identify the maximum and minimum forecasted prices in the vector to determine the possible best-case and worst-case scenarios.
+
+Trend and Signal Quality Assessment
+
+Determine if the 20-min forecast shows a consistent, statistically significant trend:
+
+Bullish (LONG): Majority (e.g., ≥ 16/20) of f1..f20 are above current_price and the slope is positive, and forecast_return exceeds a minimum threshold (e.g., +0.3%).
+
+Bearish (SHORT): Majority (e.g., ≥ 16/20) of f1..f20 are below current_price and the slope is negative, and forecast_return is below a negative threshold (e.g., -0.3%).
+
+Indecisive/Sideways: If neither is true, or the path oscillates with no strong direction.
+
+If absolute forecast_return is less than the recent volatility (e.g., less than 1x 20-min stddev), treat as noise and prepare to WAIT.
+
+Sanity Checks and Model Confidence Filter
+
+If forecast confidence score is below a pre-set threshold (e.g., < 0.7 out of 1), set signal to WAIT.
+
+Check for abnormal or erratic forecasts: if any minute-to-minute jump in the forecast path is > 3× recent volatility, mark as “Unreliable” and set to WAIT.
+
+If the final forecasted price (f20) is outside the Bollinger Bands projected for that future period by more than 2 standard deviations, flag for manual review or set to WAIT.
+
+Technical Indicator Confirmation
+
+For a LONG setup:
+
+Confirm RSI is below 70 (not overbought) and trending upwards.
+
+Confirm MACD is positive and above its signal line.
+
+Confirm price is not at or above upper Bollinger Band (unless you are trading a breakout strategy).
+
+For a SHORT setup:
+
+Confirm RSI is above 30 (not oversold) and trending down.
+
+Confirm MACD is negative and below its signal line.
+
+Confirm price is not at or below lower Bollinger Band (unless trading a breakdown).
+
+If any technical check fails, downgrade signal confidence, and if multiple fail, override signal to WAIT.
+
+Risk, Stop-Loss, and Take-Profit Calculation
+
+Entry Price: Set as the current price or, if slippage is a concern, set a limit price no worse than current + 0.05% (for LONG) or current - 0.05% (for SHORT).
+
+Take-Profit Level: Set at a price corresponding to 60–80% of the forecasted price move, i.e. for LONG: take_profit = current_price + 0.7 * (f20 - current_price).
+
+Stop-Loss Level: Set using ATR or recent 20-min volatility. For example, for LONG: stop_loss = current_price - 1.0 * recent_volatility.
+
+Ensure minimum reward/risk ratio (e.g., at least 1.5:1) between take-profit and stop-loss.
+
+Position Sizing: Calculate position size such that maximum loss at stop-loss does not exceed pre-set % risk of total capital (e.g., 0.5–1%).
+
+Liquidity and Slippage Check
+
+Verify that the average trade size and volume in recent minutes can support your calculated position size without causing more than 0.1–0.2% slippage.
+
+If not, reduce size or set signal to WAIT.
+
+Generate Trade Suggestion Object
+
+Create a structured record including:
+
+Symbol (coin)
+
+Timestamp
+
+Trade Direction (LONG/SHORT/WAIT)
+
+Entry price
+
+Take-profit price
+
+Stop-loss price
+
+Position size
+
+Forecast return and path slope
+
+Model confidence score
+
+Technical indicator snapshot
+
+Reason for trade (e.g., “Strong upward forecast + confirming technicals”)
+
+Any warnings (e.g., low liquidity, high volatility)
+
+Unique trade ID (for tracking)
+
+Write this record to the trades suggestion database/table for action or review.
+
+Monitor and Log Execution/Results
+
+If the trade is executed, log the exact fill price and timestamp.
+
+Continuously track live P&L, and mark the trade as closed when either take-profit or stop-loss is hit, or after the 20-minute forecast window elapses.
+
+Record actual outcome vs. forecast, and update system statistics for live evaluation and future model improvement.
+

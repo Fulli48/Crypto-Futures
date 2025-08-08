@@ -1,0 +1,74 @@
+Here is a copy-paste prompt you can feed directly to your AI code assistant to implement your requirements for storing simulated trade data second by second, including both dynamic per-second data and static data points:
+
+⸻
+
+📋 Prompt for AI Coding Assistant: Second-by-Second Simulated Trade Data Storage
+
+⸻
+
+For every simulated trade, implement a data structure and logic so that:
+
+For each second of the simulation, store the following values:
+	•	current_price: The asset price at that second
+	•	profit_time: Cumulative time (in seconds) spent in profit up to this point in the trade
+	•	profit_percent: Percentage of elapsed trade time that was spent in profit up to this point (profit_time / seconds_elapsed)
+	•	loss_time: Cumulative time (in seconds) spent in loss up to this point
+	•	loss_percent: Percentage of elapsed trade time that was spent in loss up to this point (loss_time / seconds_elapsed)
+	•	highest_profit: The highest unrealized profit reached so far (difference between entry price and peak price, depending on LONG or SHORT)
+	•	lowest_loss: The lowest (most negative) unrealized profit/loss reached so far (worst drawdown so far)
+
+Store this per-second data in a list/array or similar structure for the entire duration of the simulated trade.
+
+⸻
+
+For every simulation, store these static data points (the same for every second):
+	•	take_profit: Take profit value set for the trade
+	•	stop_loss: Stop loss value set for the trade
+	•	entry_price: Entry price for the trade
+	•	profit_chance: Algorithm’s predicted chance of this trade being profitable (as a %)
+	•	trade_duration_type: The type of trade by duration (e.g., “5min”, “15min”, etc.)
+	•	suggested_direction: Whether this was a suggested “LONG” or “SHORT” trade
+
+Make sure all of these static values are easily accessible along with the per-second data.
+
+⸻
+
+Summary of Data Structure:
+
+Each simulated trade should store:
+
+{
+  "static": {
+    "take_profit": ...,
+    "stop_loss": ...,
+    "entry_price": ...,
+    "profit_chance": ...,
+    "trade_duration_type": ...,
+    "suggested_direction": ...,
+  },
+  "per_second": [
+    {
+      "second": ...,
+      "current_price": ...,
+      "profit_time": ...,
+      "profit_percent": ...,
+      "loss_time": ...,
+      "loss_percent": ...,
+      "highest_profit": ...,
+      "lowest_loss": ...
+    },
+    ...
+  ]
+}
+
+
+⸻
+
+Additional Implementation Instructions:
+	•	Update profit_time and loss_time counters every second depending on whether the trade would be in profit or loss at that moment (for the direction of the trade).
+	•	Update highest_profit and lowest_loss at every second based on the best/worst unrealized outcome up to that point.
+	•	Ensure all data is recorded even if the trade closes early (TP/SL hit).
+
+⸻
+
+Feed this directly to your AI code assistant for full and precise implementation!

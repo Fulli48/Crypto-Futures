@@ -1,0 +1,54 @@
+You must make very specific visual layout corrections to the “Cryptocurrency Trading Intelligence” section of the app while strictly preserving the current design aesthetic.
+
+🧠 GOAL OVERVIEW:
+The current layout has separated the header, brain stats, and buttons into different blocks. This must be corrected by merging them into a single unified card-style container while retaining the existing glow-themed, dark-mode formatting and spacing. You must not remove or alter the visual style of the buttons or stat formatting.
+
+Follow these exact layout rules and visual behaviors:
+
+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+🔧 STRUCTURE ADJUSTMENTS:
+1. Combine the following into ONE container with a dark background, consistent rounded corners, and shared padding:
+   • The section header: “Cryptocurrency Trading Intelligence”
+   • The subheading: “Real-time market insights powered by machine learning”
+   • The brain + stat cards (Expected Profit Strength and Trade Failure Rate)
+   • The buttons: “View Chart Data” and “Learning System”
+
+2. Center the header and subtext horizontally. They should appear at the top of this new single card block and sit flush above the stat row. No separate margin box. Apply margin-bottom: 1.2rem.
+
+3. Directly beneath the subtitle, create a **horizontal stat section** with the following layout:
+   • On the left: Expected Profit Strength (red %, title, and description)
+   • In the exact horizontal center between the two: the brain icon 🧠
+   • On the right: Trade Failure Rate (green %, title, and description)
+   • Make sure the brain is visually and mathematically centered — use Flexbox alignment and spacing evenly.
+   • Use a vertical divider line only if it is symmetrical and doesn’t throw off the centering
+
+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+🎨 STYLING RULES TO PRESERVE:
+- Maintain all glow/button styles currently used
+- Keep buttons exactly as they are now (pill shape, icons, gradients, and hover behavior)
+- Keep stat text (color, weight, padding, font sizes) as currently styled
+- Brain icon size: font-size: 1.8rem–2rem
+- Overall section padding: 2rem
+- Border-radius: 16px for the entire new unified block
+- Background: preserve current dark blue/black tone used in other cards
+- Maintain the purple border glow or soft box-shadow around the card
+
+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+📱 MOBILE RESPONSIVENESS:
+- On mobile, ensure stat blocks stack vertically (Expected Profit Strength on top, brain icon in the middle, Trade Failure Rate below).
+- Ensure the two buttons remain stacked or side-by-side with wrap if space allows
+- Don’t shrink the buttons to unreadable size; let them stack
+
+–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+🧩 IMPLEMENTATION:
+- Create a React component or HTML block that represents this new combined layout
+- Replace the current separated blocks with this new component
+- DO NOT REMOVE any visual elements — only reposition and regroup them properly within one cohesive section
+
+✅ END RESULT SHOULD:
+- Look identical in style to the current UI
+- Fix the spacing between header and stat block
+- Perfectly center the brain icon between stat cards
+- Combine the entire section (header + stats + buttons) into one container
+
+If unsure about alignment, use Flexbox or Grid and visually test on both desktop and mobile layouts. The result must look **intentional, symmetrical, and visually centered**.

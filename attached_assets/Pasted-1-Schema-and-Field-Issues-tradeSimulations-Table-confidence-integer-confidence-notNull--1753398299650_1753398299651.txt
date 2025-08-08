@@ -1,0 +1,32 @@
+1. Schema and Field Issues
+
+tradeSimulations Table
+	•	confidence: integer("confidence").notNull()
+	•	Should this be real (float) if your model outputs decimal confidences? If your model is outputting [0, 1] or [0, 100] floats, storing as integer could cause rounding, truncation, or loss of precision.
+	•	profitLikelihood: integer("profit_likelihood").notNull()
+	•	Same as above—most models output floats, not ints. Should be real or mapped/rounded consistently everywhere.
+	•	profitLoss: decimal("profit_loss", { precision: 10, scale: 4 })
+	•	This field isn’t .notNull(). If your code expects it to always be present after trade completion, you risk NULL exceptions downstream.
+	•	profitablePercentage: real("profitable_percentage").default(0)
+	•	Double-check that all inserts/updates actually provide this field; if not, are you sure .default(0) is applied on all code paths?
+	•	tradeHistory: json("trade_history")
+	•	Storing second-by-second data as JSON can result in giant rows for long-running trades. Are you sure you don’t hit size or performance problems?
+	•	actualOutcome: text("actual_outcome")
+	•	No check constraint on valid values (‘TP_HIT’, ‘SL_HIT’, …). Typos or mismatched casing in code can result in logic breakage (like 'tp_hit' vs 'TP_HIT').
+
+tradeChartData Table
+	•	tradeId: integer("trade_id").notNull()
+	•	No mention of a foreign key constraint! If not present, you risk orphaned data.
+	•	profitTime and lossTime
+	•	Both cumulative, but do you ever have both > 0 at the same time? (Edge case: trade oscillates around entry, and logic is unclear about how you update these).
+	•	All Decimal/Real Fields
+	•	JavaScript has poor built-in decimal support; if you store as stringified decimals, make sure parsing is handled everywhere. You may end up with "1.0" as a string instead of number, which can break calculations.
+
+⸻
+
+2. Process and Data Flow Issues
+	•	Real-Time Price Updates
+	•	“Every 2 seconds” is fast. If your queue or event handler lags, you may get duplicate or out-of-order entries, leading to time-in-profit miscalculations.
+	•	If server time and DB time aren’t perfectly in sync, createdAt and timestamp may be off, especially with high-frequency trading.
+	•	Trade Completion & Analysis
+	•	Is the process idempotent? If your completion workflow gets called twice due to a bug or a retry, does it double-count or overwrite performance metrics?

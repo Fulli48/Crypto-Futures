@@ -1,0 +1,42 @@
+1. **Adaptive Threshold Calculation:**
+   - After each model retraining (or every N trades, e.g., N = 100), calculate:
+      - `avg_confidence` = mean of last N generated confidence % values
+      - `std_confidence` = standard deviation of last N confidence values
+      - `avg_profit_likelihood` = mean of last N generated profit likelihood % values
+      - `std_profit_likelihood` = standard deviation of last N profit likelihood values
+
+2. **Set Dynamic Filter Thresholds:**
+   - Define filtering thresholds as follows:
+      - `min_confidence = avg_confidence - 1.0 * std_confidence` (never lower than 45%)
+      - `min_profit_likelihood = avg_profit_likelihood - 1.0 * std_profit_likelihood` (never lower than 40%)
+   - Example:  
+      - If avg_confidence = 65%, std_confidence = 6%, then min_confidence = max(45, 59)
+      - If avg_profit_likelihood = 61%, std_profit_likelihood = 8%, then min_profit_likelihood = max(40, 53)
+
+3. **Filter Application Logic:**
+   - For each new trade suggestion, apply the following:
+      - If both `confidence < min_confidence` **and** `profit_likelihood < min_profit_likelihood`, classify as "filtered out" and do not simulate or present to user.
+      - If either value meets or exceeds its respective dynamic minimum, allow the trade suggestion to be simulated or shown.
+   - This ensures only clear statistical outliers (weak suggestions) are blocked.
+
+4. **Learning and Value Propagation:**
+   - Every completed or simulated trade (including filtered-out cases) should be used to:
+      - Update the ML model via supervised learning, with actual trade outcome as label.
+      - Append the trade’s confidence and profit likelihood values to the running history used for average and stdev calculation.
+      - This will cause average values and thresholds to adjust automatically as the model improves (or regresses), tightening or loosening the filter without manual intervention.
+
+5. **Transparency and Logging:**
+   - For each trade suggestion, record and display:
+      - The current `avg_confidence`, `std_confidence`, and `min_confidence`
+      - The current `avg_profit_likelihood`, `std_profit_likelihood`, and `min_profit_likelihood`
+      - Whether the suggestion was filtered out or accepted, and why
+   - Log all filtered-out trades for future review and model tuning.
+
+6. **Edge Case Handling:**
+   - If less than N trades exist in the history buffer, use available trades to compute averages; if fewer than 10, temporarily disable filtering (allow all through).
+
+7. **Documentation:**
+   - Clearly document in code and user-facing docs that the system uses a rolling average and standard deviation from recent trade suggestions to set live filtering thresholds, ensuring only statistically weak trades are blocked as the model matures.
+
+**Goal:**  
+Implement a fully adaptive, statistics-based filtering mechanism for trade suggestions using explicit moving average and standard deviation calculations, ensuring robust, dynamic, and continuously improving trade selection. All values and filtering actions must be logged and visible for transparency.

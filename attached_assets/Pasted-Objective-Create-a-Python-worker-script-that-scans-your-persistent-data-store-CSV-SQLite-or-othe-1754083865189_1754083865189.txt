@@ -1,0 +1,111 @@
+Objective:
+Create a Python worker script that scans your persistent data store (CSV, SQLite, or other database) for each symbol, detects rows where RSI, volume, or volatility are missing or marked as "N/A"/None/empty, and fills in the missing values using standard technical analysis calculations. The worker must be robust, handle restarts, and update the data in place.
+
+Instructions:
+
+Initialization & Data Access
+
+Connect to your persistent data store (CSV, SQLite, etc.).
+
+For each target symbol (e.g., ETHUSDT, BTCUSDT), fetch the latest 600 (or more) rows ordered by timestamp.
+
+Detection of Missing Fields
+
+For each row, check if any of the following are missing/invalid:
+
+RSI (None, "N/A", NaN, or blank)
+
+Volume (None, "N/A", NaN, or blank)
+
+Volatility (None, "N/A", NaN, or blank)
+
+Calculation Logic
+
+For RSI: Use the standard 14-period RSI. If fewer than 14 periods, skip calculation for that row.
+
+For Volume: If missing, use the raw volume field from your data source.
+
+For Volatility: Use a 14-period rolling standard deviation of price returns, or ATR(14).
+
+Use existing Python libraries if available (pandas, ta-lib, or pandas-ta).
+
+Backfilling
+
+For every row with missing/invalid RSI, volume, or volatility:
+
+Compute the value using the last N (14 or more) rows as needed.
+
+Update the row in the persistent store with the newly computed value.
+
+Mark quality as “Complete” if all fields are filled.
+
+Persistence & Robustness
+
+All updates must be written back to the database or file immediately (no batch buffering).
+
+On workflow or system restart, the worker should resume scanning/filling from the latest data.
+
+Handle errors gracefully—log and skip problematic rows.
+
+Looping & Scheduling
+
+Run the worker as a continuous loop (with a short sleep interval, e.g., 5 seconds) or as a scheduled job.
+
+Optionally, allow triggering a full scan/backfill on startup.
+
+Logging & Monitoring
+
+Log all updates and any rows skipped due to insufficient data.
+
+Output a summary at the end of each run (e.g., “Filled 23 RSI, 10 volume, 15 volatility fields for ETHUSDT”).
+
+Extensibility
+
+Code should be modular and easy to add new metrics later.
+
+Example Pseudocode Outline:
+
+python
+Copy
+Edit
+import pandas as pd
+import time
+
+def calculate_rsi(series, period=14):
+    # (implement or use pandas-ta)
+    pass
+
+def calculate_volatility(series, period=14):
+    # Rolling stddev of returns or ATR
+    pass
+
+def worker(symbol, data_source):
+    while True:
+        df = load_data(symbol, data_source)   # e.g., from CSV or DB
+        for i, row in df.iterrows():
+            needs_update = False
+            # RSI
+            if pd.isnull(row['RSI']) or row['RSI'] in ["N/A", ""]:
+                if i >= 13:
+                    rsi = calculate_rsi(df['price'].iloc[:i+1], 14)
+                    df.at[i, 'RSI'] = rsi
+                    needs_update = True
+            # Volume
+            if pd.isnull(row['volume']) or row['volume'] in ["N/A", ""]:
+                # Fill from raw or recalculate if needed
+                pass
+            # Volatility
+            if pd.isnull(row['volatility']) or row['volatility'] in ["N/A", ""]:
+                if i >= 13:
+                    vol = calculate_volatility(df['price'].iloc[:i+1], 14)
+                    df.at[i, 'volatility'] = vol
+                    needs_update = True
+            if needs_update:
+                update_row(symbol, row['timestamp'], df.iloc[i])
+        save_data(symbol, df, data_source)
+        log_updates(symbol)
+        time.sleep(5)
+Replace placeholder methods with your actual DB/file read/write logic.
+
+Summary:
+Build a persistent Python worker that, for each symbol, continuously scans your stored dataset for missing RSI, volume, or volatility values, calculates and fills them using the last N rows as needed, updates the persistent store in place, and runs robustly across workflow restarts.

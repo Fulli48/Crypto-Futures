@@ -1,0 +1,40 @@
+Return the exact, detailed internal implementation of the ML engine (machine learning trade signal engine) used for generating trade suggestions in this project.
+
+1. **Model Versioning and Configuration:**
+   - Specify the current ML engine version, model configuration, and last retraining date in use.
+
+2. **Input Data Pipeline:**
+   - Describe how raw input data (market prices, indicators, etc.) is sourced, preprocessed (including normalization, missing value handling, and outlier removal), and fed into the ML engine.
+
+3. **ML Algorithm and Model Structure:**
+   - Explain the machine learning algorithms and model structures used (e.g., neural networks, random forests), and the model’s input features and training process.
+
+4. **Trade Suggestion Generation:**
+   - Step-by-step, explain how the ML engine produces trade signals (LONG/SHORT/WAIT), including any thresholds, post-processing, or rule-based overlays.
+
+5. **Confidence and Profit Likelihood Calculations:**
+   - Provide the exact formula, model output, or algorithm the ML engine uses to calculate confidence % and profit likelihood % for each suggestion.
+
+6. **Suggestion Output:**
+   - List all data fields generated per trade suggestion (signal, confidence, profit likelihood, etc.).
+
+7. **Model Updating and Learning:**
+   - Describe the ML engine’s retraining or updating logic, including data collection, live or periodic retraining, and adaptation to new conditions.
+
+8. **Edge Cases and Fallbacks:**
+   - Explain how the engine handles edge cases, missing inputs, or inference errors (e.g., fallback to baseline, abstention, or error reporting).
+
+9. **Output Validation and Error Handling:**
+   - Describe any output validation, boundary checking, or error handling for nonsensical or out-of-bounds values.
+
+10. **Logging, Monitoring, and Explainability:**
+    - Outline any built-in logging, monitoring, or explainability features for debugging, compliance, or developer review.
+
+11. **Integration and Dependencies:**
+    - Specify where and how the ML engine is called in the codebase, and any service dependencies it requires for operation.
+
+12. **Data Security and Privacy:**
+    - Briefly describe any data security or privacy safeguards in place within the ML engine’s data pipeline and storage.
+
+Goal:  
+Deliver a complete, technical, step-by-step breakdown of how the ML engine generates trade suggestions, confidence %, profit likelihood %, and all related outputs, covering every aspect listed above.

@@ -1,0 +1,90 @@
+SINGLE BLOCK INSTRUCTION FOR "TRADE OUTCOME CHART" FEATURE:
+
+Add a new interactive feature to the application UI—a prominently labeled, clickable button (“Show Trade Performance” or “Trade Outcome Stats”) at the top of the dashboard. When clicked, it opens a modal or side-drawer containing the following:
+
+UI/UX Implementation:
+
+Place the button above or near your trade suggestion panels for visibility.
+
+On click, asynchronously fetch all available trade signals, actual trade outcomes, and relevant statistics for at least the past 1,000 trades (or as many as stored).
+
+Open a modal (or drawer) that fills at least 60% of the screen width on desktop, is scrollable, and mobile responsive.
+
+Data to Visualize:
+
+For each closed trade (with known outcome), pull:
+
+signal_id, symbol, timestamp, entry price, exit price, stop-loss/take-profit outcome, realized P&L (percent and absolute), maximum favorable excursion (MFE), maximum adverse excursion (MAE), whether the trade was a “failure” (hit stop or significant loss), and the 20-min forecast path used.
+
+Meta: trade direction (LONG/SHORT), confidence score, risk/reward at open, and any warnings or overrides.
+
+Main Charts in the Modal:
+
+A. Trade Failure Rate Timeline:
+
+A line/bar chart showing the rolling failure rate (percent of trades that hit stop-loss or closed at a loss), plotted over time or number of trades.
+
+Overlay success rate for context.
+
+Allow toggling between all trades, only LONG, only SHORT, and by symbol.
+
+B. Profit Strength Histogram:
+
+A histogram showing the distribution of realized profit/loss for all trades.
+
+Highlight average, median, and top decile profit trades.
+
+Color-code bars for winning vs. losing trades.
+
+C. 20-Minute Forecast Realization Chart:
+
+For a sample of trades (e.g., last 20, or select by click), plot:
+
+The full 20-min forecasted path at entry (line)
+
+The actual realized price path (overlay line)
+
+Indicate on chart where entry, exit, take-profit, and stop-loss occurred.
+
+Allow user to click any trade on the timeline or histogram to bring up this detailed trade chart.
+
+Key Metrics/Stats Panel in Modal:
+
+Show summary stats for selected time window:
+
+Total trades, percent winners, average/median profit per trade, average/median loss, best/worst trades.
+
+Average and median hit rates for take-profit vs. stop-loss.
+
+Breakdown of failures by warning type, model agreement, or signal quality score.
+
+Actionable Feedback:
+
+If the rolling failure rate increases above a historical average or defined threshold (e.g., 30% stop-loss hit rate), show a clear warning (“Failure rate is elevated! Review recent trades and model thresholds.”).
+
+If profit strength distribution is skewed (e.g., high frequency of small losses and few big winners), suggest investigating risk/reward or stop-loss parameters.
+
+Charting Implementation Details:
+
+Use a charting library like Chart.js, Recharts, or Plotly for smooth, interactive, zoomable charts.
+
+All axes should be labeled; tooltips on hover should show full trade stats (including entry, exit, P&L, confidence, and warnings).
+
+On modal close, release chart memory and restore UI state.
+
+Data Loading and Error Handling:
+
+Fetch data in pages/chunks for performance if >5,000 trades in history.
+
+If data fetch fails, show a clear error and retry button.
+
+Always ensure privacy/security—never expose sensitive account info.
+
+Extensibility:
+
+Structure code so new chart types (e.g., per-model breakdowns, feature importances at trade time) can be easily added to the modal.
+
+Log all user opens/interactions for feature usage analytics.
+
+Result:
+This feature gives every user, developer, or operator instant, actionable visual insight into signal failure rates, profit strengths, and how the full 20-min forecast path related to real outcomes for every trade. It provides the “why and when” behind both model strengths and weaknesses, supports rapid diagnosis, and makes continuous tuning or debugging of signal generation truly data-driven.

@@ -1,0 +1,41 @@
+### Live ML Chart Data Table – Rolling 60-Minute Window (Per Coin)
+
+1. For each tracked cryptocurrency (e.g., BTC, ETH, SOL, XRP, ADA, HBAR), maintain a dedicated chart data table in the backend/database.
+
+2. The table should always contain exactly the **most recent 60 minutes** of data for each coin, with one row per minute.
+
+3. Each row must include:
+   - Timestamp (start of that minute, e.g. 14:32:00)
+   - Open, high, low, close price for the minute (OHLC)
+   - Volume for that minute
+   - Calculated indicators for that minute:  
+     • RSI  
+     • MACD  
+     • Bollinger Bands (upper, middle, lower)  
+     • Stochastic Oscillator (K, D)  
+     • EMA alignment (e.g., which EMAs are above/below)  
+     • Support/Resistance levels  
+     • Market Structure flag/label (e.g., range, breakout, trend, reversal, etc.)  
+     • Detected patterns (candlestick or price patterns)  
+     • Volatility metric (ATR or similar)  
+     • Volume Profile segment/bin info
+
+4. Every 3 seconds, the live update system should:
+   - Fetch the latest price and append it as the “current price” for the ongoing minute.
+   - Update the OHLC for the current minute using incoming tick data (update close, possibly high/low if exceeded).
+   - Update live indicators that are calculated with each new price (intraminute), as desired.
+
+5. At the conclusion of each minute:
+   - Finalize that minute’s OHLC, volume, and all indicator values.
+   - Add the completed minute as a new row to the chart data table.
+   - Remove the **oldest minute** (so the table always has exactly 60 rows per coin).
+   - Start a new row for the next minute, initializing it with the first price/volume of that minute.
+
+6. Timestamps must be precise (UTC recommended) and stored in ISO format (e.g., 2025-07-24T14:32:00Z).
+
+7. All ML signal generation must read only from this rolling 60-row chart table, ensuring features like RSI, MACD, etc. are computed on fresh, synchronized, and clean market data.
+
+---
+
+**Instruction:**  
+Implement the above for each tracked coin, ensuring the chart data table always represents the latest 60 minutes of live market action, minute-by-minute, with all required features for robust ML signal generation. Live updates every 3 seconds adjust the "current price" for the open minute, and at the end of each minute, the window rolls forward by one.
