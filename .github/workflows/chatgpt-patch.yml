@@ -117,18 +117,21 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -e
+          set -euo pipefail
           OWNER_REPO="${GITHUB_REPOSITORY}"
+          OWNER="${OWNER_REPO%%/*}"
           TITLE="ChatGPT Patch from Issue #${{ github.event.issue.number }}"
-          BODY=$'This pull request was automatically created from a [CHATGPT PATCH] submission.\n\n- Source issue: #${{ github.event.issue.number }}'
+          BODY="Automated PR created from a [CHATGPT PATCH] in issue #${{ github.event.issue.number }}."
 
-          PR_NUMBER="$(gh api -X GET "/repos/${OWNER_REPO}/pulls?head=${{ github.repository_owner }}:dev&base=main&state=all" -q '.[0].number' || true)"
+          # Look for an existing PR from dev -> main (any state)
+          PR_NUMBER="$(gh api "/repos/${OWNER_REPO}/pulls?head=${OWNER}:dev&base=main&state=all" -q '.[0].number' || true)"
 
-          if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" != "null" ]; then
+          if [[ -n "$PR_NUMBER" && "$PR_NUMBER" != "null" ]]; then
             gh api -X PATCH "/repos/${OWNER_REPO}/pulls/${PR_NUMBER}" \
               -f state=open -f title="$TITLE" -f body="$BODY" >/dev/null
             echo "Updated PR #$PR_NUMBER"
           else
             gh api -X POST "/repos/${OWNER_REPO}/pulls" \
               -f title="$TITLE" -f head="dev" -f base="main" -f body="$BODY" >/dev/null
-            echo "
+            echo "Created PR dev -> main"
+          fi
