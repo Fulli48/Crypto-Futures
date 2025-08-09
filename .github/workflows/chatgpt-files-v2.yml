@@ -1,0 +1,196 @@
+﻿name: ChatGPT Files v2 Processor
+
+on:
+  workflow_dispatch:
+    inputs:
+      body:
+        description: "Paste your [CHATGPT FILES v2] payload here"
+        required: false
+        type: string
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  apply-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity (global)
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Create/refresh dev branch from main
+        run: |
+          set -e
+          git fetch origin --prune
+          if git ls-remote --exit-code --heads origin dev >/dev/null 2>&1; then
+            git checkout -B dev origin/dev
+          else
+            git checkout -B dev origin/main || git checkout -B dev main
+          fi
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Extract body
+        id: body
+        run: |
+          set -euo pipefail
+          if [ -n "${{ github.event.inputs.body }}" ]; then
+            printf "%s" "${{ github.event.inputs.body }}" > body.txt
+            echo "Loaded body from workflow_dispatch input."
+          else
+            jq -r '.issue.body // .comment.body // empty' "$GITHUB_EVENT_PATH" > body.txt || echo "" > body.txt
+            echo "Loaded body from event payload."
+          fi
+          echo "----- FIRST 30 LINES -----"
+          head -n 30 body.txt || true
+          echo "--------------------------"
+
+      - name: Detect [CHATGPT FILES v2] marker
+        id: detect
+        run: |
+          set -euo pipefail
+          if grep -iq '^\[CHATGPT FILES v2\]' body.txt; then
+            echo "has_marker=true" >> "$GITHUB_OUTPUT"
+            echo "Detected v2 marker."
+          elif grep -iq '^\[CHATGPT FILES\]' body.txt; then
+            echo "has_marker=true" >> "$GITHUB_OUTPUT"
+            echo "Detected legacy marker."
+          else
+            echo "has_marker=false" >> "$GITHUB_OUTPUT"
+            echo "Marker not found; nothing to do."
+          fi
+
+      - name: Apply FILES v2 blocks
+        if: steps.detect.outputs.has_marker == 'true'
+        run: |
+          set -euo pipefail
+          python3 - << 'PY'
+import os, base64, pathlib, sys, subprocess
+
+body = open('body.txt','r',encoding='utf-8').read().replace('\r\n','\n')
+
+blocks = []
+path = None; opts = {}; buf = []
+for line in body.split('\n'):
+    if line.startswith('---file:') and line.rstrip().endswith('---'):
+        if path is not None:
+            print("ERROR: nested file blocks", file=sys.stderr); sys.exit(1)
+        header = line[len('---file:'):-3].strip()  # strip trailing ---
+        parts = [p.strip() for p in header.split(';') if p.strip()]
+        if not parts:
+            print("ERROR: empty file header", file=sys.stderr); sys.exit(1)
+        path = parts[0]
+        opts = {}
+        for p in parts[1:]:
+            if '=' in p:
+                k,v = p.split('=',1); opts[k.strip().lower()] = v.strip()
+            else:
+                opts[p.strip().lower()] = True
+        buf = []
+        continue
+    if line.strip() == '---endfile---':
+        if path is None:  # stray end
+            continue
+        content = '\n'.join(buf)
+        blocks.append((path, opts, content))
+        path = None; opts = {}; buf = []
+        continue
+    if path is not None:
+        buf.append(line)
+
+changes = []
+for (p, opts, content) in blocks:
+    p = p.strip()
+    # basic path safety: no absolute paths, no parent traversal parts
+    if not p or p.startswith('/') or '..' in p.split('/'):
+        print(f"ERROR: unsafe path: {p}", file=sys.stderr); sys.exit(1)
+    pp = pathlib.Path(p)
+    delete = bool(opts.get('delete') or content.strip() == '__DELETE__')
+    encoding = (opts.get('encoding') or '').lower()
+
+    if delete:
+        if pp.exists():
+            subprocess.run(['git','rm','-f',p], check=True)
+            changes.append(f'DELETE {p}')
+        else:
+            changes.append(f'DELETE (missing) {p}')
+        continue
+
+    if encoding == 'base64':
+        data = base64.b64decode(content.encode('utf-8'))
+        pp.parent.mkdir(parents=True, exist_ok=True)
+        with open(pp, 'wb') as f: f.write(data)
+    else:
+        pp.parent.mkdir(parents=True, exist_ok=True)
+        with open(pp, 'w', encoding='utf-8', newline='\n') as f: f.write(content)
+
+    subprocess.run(['git','add',p], check=True)
+    changes.append(f'WRITE {p}')
+
+open('changes.txt','w',encoding='utf-8').write('\n'.join(changes))
+print('\\n'.join(changes) if changes else 'No file blocks found.')
+PY
+
+      - name: Show changes summary
+        if: steps.detect.outputs.has_marker == 'true'
+        run: |
+          test -f changes.txt && cat changes.txt || echo "No changes captured."
+
+      - name: Commit changes
+        if: steps.detect.outputs.has_marker == 'true'
+        run: |
+          set -e
+          if git diff --staged --quiet; then
+            echo "No staged changes."
+          else
+            MSG="Apply ChatGPT FILES v2 from ${{ github.event.issue.html_url || 'workflow_dispatch' }}"
+            git commit -m "$MSG"
+          fi
+
+      - name: Push dev
+        if: steps.detect.outputs.has_marker == 'true'
+        run: |
+          set -e
+          git push --force-with-lease origin dev
+
+      - name: Ensure PR dev -> main exists (robust)
+        if: steps.detect.outputs.has_marker == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git fetch origin main dev || true
+          AHEAD="$(git rev-list --left-right --count origin/main...origin/dev | awk '{print $2}' || echo 0)"
+          if [ "${AHEAD:-0}" = "0" ]; then
+            echo "Nothing to PR (dev==main)."; exit 0; fi
+
+          PR="$(gh pr list --head dev --base main --state all --json number,state -q '.[0].number' || true)"
+          STATE="$(gh pr list --head dev --base main --state all --json number,state -q '.[0].state' || true)"
+          TITLE="ChatGPT Files v2"
+          BODY="Automated PR from a [CHATGPT FILES v2] submission."
+
+          if [ -n "$PR" ] && [ "$PR" != "null" ]; then
+            if [ "$STATE" = "MERGED" ] || [ "$STATE" = "merged" ]; then
+              echo "Existing PR was merged; creating a new PR."
+              gh api -X POST "/repos/${GITHUB_REPOSITORY}/pulls" -f title="$TITLE" -f head="dev" -f base="main" -f body="$BODY" >/dev/null
+            else
+              if [ "$STATE" = "CLOSED" ] || [ "$STATE" = "closed" ]; then
+                gh api -X PATCH "/repos/${GITHUB_REPOSITORY}/issues/$PR" -f state=open >/dev/null
+              fi
+              gh api -X PATCH "/repos/${GITHUB_REPOSITORY}/pulls/$PR" -f title="$TITLE" -f body="$BODY" >/dev/null
+            fi
+          else
+            gh api -X POST "/repos/${GITHUB_REPOSITORY}/pulls" -f title="$TITLE" -f head="dev" -f base="main" -f body="$BODY" >/dev/null
+          fi
