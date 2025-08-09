@@ -78,7 +78,6 @@ jobs:
           set -euo pipefail
           python3 - << 'PY'
 import os, base64, pathlib, sys, subprocess
-
 body = open('body.txt','r',encoding='utf-8').read().replace('\r\n','\n')
 
 blocks = []
@@ -87,33 +86,28 @@ for line in body.split('\n'):
     if line.startswith('---file:') and line.rstrip().endswith('---'):
         if path is not None:
             print("ERROR: nested file blocks", file=sys.stderr); sys.exit(1)
-        header = line[len('---file:'):-3].strip()  # strip trailing ---
+        header = line[len('---file:'):-3].strip()
         parts = [p.strip() for p in header.split(';') if p.strip()]
         if not parts:
             print("ERROR: empty file header", file=sys.stderr); sys.exit(1)
-        path = parts[0]
-        opts = {}
+        path = parts[0]; opts = {}
         for p in parts[1:]:
             if '=' in p:
                 k,v = p.split('=',1); opts[k.strip().lower()] = v.strip()
             else:
                 opts[p.strip().lower()] = True
-        buf = []
-        continue
+        buf = []; continue
     if line.strip() == '---endfile---':
-        if path is None:  # stray end
-            continue
+        if path is None: continue
         content = '\n'.join(buf)
         blocks.append((path, opts, content))
-        path = None; opts = {}; buf = []
-        continue
+        path = None; opts = {}; buf = []; continue
     if path is not None:
         buf.append(line)
 
 changes = []
 for (p, opts, content) in blocks:
     p = p.strip()
-    # basic path safety: no absolute paths, no parent traversal parts
     if not p or p.startswith('/') or '..' in p.split('/'):
         print(f"ERROR: unsafe path: {p}", file=sys.stderr); sys.exit(1)
     pp = pathlib.Path(p)
@@ -140,7 +134,7 @@ for (p, opts, content) in blocks:
     changes.append(f'WRITE {p}')
 
 open('changes.txt','w',encoding='utf-8').write('\n'.join(changes))
-print('\\n'.join(changes) if changes else 'No file blocks found.')
+print('\n'.join(changes) if changes else 'No file blocks found.')
 PY
 
       - name: Show changes summary
@@ -155,8 +149,7 @@ PY
           if git diff --staged --quiet; then
             echo "No staged changes."
           else
-            MSG="Apply ChatGPT FILES v2 from ${{ github.event.issue.html_url || 'workflow_dispatch' }}"
-            git commit -m "$MSG"
+            git commit -m "Apply ChatGPT FILES v2"
           fi
 
       - name: Push dev
@@ -177,16 +170,16 @@ PY
             echo "Nothing to PR (dev==main)."; exit 0; fi
 
           PR="$(gh pr list --head dev --base main --state all --json number,state -q '.[0].number' || true)"
-          STATE="$(gh pr list --head dev --base main --state all --json number,state -q '.[0].state' || true)"
+          STATE="$(gh pr list --head dev --base main --state all --json number,state -q '.[0].state' || true | tr '[:upper:]' '[:lower:]')"
           TITLE="ChatGPT Files v2"
           BODY="Automated PR from a [CHATGPT FILES v2] submission."
 
           if [ -n "$PR" ] && [ "$PR" != "null" ]; then
-            if [ "$STATE" = "MERGED" ] || [ "$STATE" = "merged" ]; then
+            if [ "$STATE" = "merged" ]; then
               echo "Existing PR was merged; creating a new PR."
               gh api -X POST "/repos/${GITHUB_REPOSITORY}/pulls" -f title="$TITLE" -f head="dev" -f base="main" -f body="$BODY" >/dev/null
             else
-              if [ "$STATE" = "CLOSED" ] || [ "$STATE" = "closed" ]; then
+              if [ "$STATE" = "closed" ]; then
                 gh api -X PATCH "/repos/${GITHUB_REPOSITORY}/issues/$PR" -f state=open >/dev/null
               fi
               gh api -X PATCH "/repos/${GITHUB_REPOSITORY}/pulls/$PR" -f title="$TITLE" -f body="$BODY" >/dev/null
