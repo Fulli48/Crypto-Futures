@@ -1,7 +1,12 @@
 ﻿name: ChatGPT Files Processor
 
 on:
-  workflow_dispatch: {}   # manual run button (for debugging)
+  workflow_dispatch:
+    inputs:
+      body:
+        description: "Paste your [CHATGPT FILES] payload here"
+        required: false
+        type: string
   issues:
     types: [opened, edited]
   issue_comment:
@@ -20,21 +25,37 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Show event info
+        run: |
+          echo "EVENT: $GITHUB_EVENT_NAME"
+          echo "REPO:  $GITHUB_REPOSITORY"
+          echo "SHA:   $GITHUB_SHA"
+
       - name: Extract body
         id: body
         run: |
           set -euo pipefail
-          if [ -f "$GITHUB_EVENT_PATH" ]; then
-            jq -r '.issue.body // .comment.body // empty' "$GITHUB_EVENT_PATH" > body.txt || echo "" > body.txt
+          # If manual dispatch body is provided, use it; otherwise read from the event JSON.
+          if [ -n "${{ github.event.inputs.body }}" ]; then
+            printf "%s" "${{ github.event.inputs.body }}" > body.txt
+            echo "Loaded body from workflow_dispatch input."
           else
-            echo "" > body.txt
+            if [ -f "$GITHUB_EVENT_PATH" ]; then
+              jq -r '.issue.body // .comment.body // empty' "$GITHUB_EVENT_PATH" > body.txt || echo "" > body.txt
+              echo "Loaded body from event payload."
+            else
+              echo "" > body.txt
+              echo "No event payload found; created empty body."
+            fi
           fi
+
           echo "----- FIRST 40 LINES -----"
           head -n 40 body.txt || true
           echo "--------------------------"
 
       - name: Detect [CHATGPT FILES] marker
         id: detect
+        shell: bash
         run: |
           set -euo pipefail
           if grep -iq '\[CHATGPT FILES\]' body.txt; then
@@ -55,7 +76,10 @@ import os, re, pathlib, sys, subprocess
 with open('body.txt','r',encoding='utf-8') as f:
     body = f.read()
 
-# Match: ```file path=some/relative/path\n...content...\n```
+# Match blocks like:
+# ```file path=relative/path
+# <content>
+# ```
 pattern = re.compile(r"```file\s+path=([^\n]+)\n(.*?)\n```", re.DOTALL)
 
 changes = []
@@ -64,6 +88,7 @@ for m in pattern.finditer(body):
     content = m.group(2).replace('\r\n','\n')
 
     p = pathlib.Path(path)
+
     if content.strip() == "__DELETE__":
         if p.exists():
             subprocess.run(["git","rm","-f",path], check=True)
@@ -81,7 +106,6 @@ for m in pattern.finditer(body):
 print("Applied changes:" if changes else "No FILE blocks found.")
 for c in changes: print("  ", c)
 
-# Save a summary for later steps
 with open('changes.txt','w',encoding='utf-8') as f:
     for c in changes: f.write(c+"\n")
 PY
