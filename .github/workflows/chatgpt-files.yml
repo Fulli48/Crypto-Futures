@@ -1,0 +1,148 @@
+﻿name: ChatGPT Files Processor
+
+on:
+  workflow_dispatch: {}   # manual run button (for debugging)
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  apply-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract body
+        id: body
+        run: |
+          set -euo pipefail
+          if [ -f "$GITHUB_EVENT_PATH" ]; then
+            jq -r '.issue.body // .comment.body // empty' "$GITHUB_EVENT_PATH" > body.txt || echo "" > body.txt
+          else
+            echo "" > body.txt
+          fi
+          echo "----- FIRST 40 LINES -----"
+          head -n 40 body.txt || true
+          echo "--------------------------"
+
+      - name: Detect [CHATGPT FILES] marker
+        id: detect
+        run: |
+          set -euo pipefail
+          if grep -iq '\[CHATGPT FILES\]' body.txt; then
+            echo "has_marker=true" >> "$GITHUB_OUTPUT"
+            echo "Detected marker."
+          else
+            echo "has_marker=false" >> "$GITHUB_OUTPUT"
+            echo "Marker not found; nothing to do."
+          fi
+
+      - name: Apply FILE blocks
+        if: steps.detect.outputs.has_marker == 'true'
+        run: |
+          set -euo pipefail
+          python3 - << 'PY'
+import os, re, pathlib, sys, subprocess
+
+with open('body.txt','r',encoding='utf-8') as f:
+    body = f.read()
+
+# Match: ```file path=some/relative/path\n...content...\n```
+pattern = re.compile(r"```file\s+path=([^\n]+)\n(.*?)\n```", re.DOTALL)
+
+changes = []
+for m in pattern.finditer(body):
+    path = m.group(1).strip()
+    content = m.group(2).replace('\r\n','\n')
+
+    p = pathlib.Path(path)
+    if content.strip() == "__DELETE__":
+        if p.exists():
+            subprocess.run(["git","rm","-f",path], check=True)
+            changes.append(f"DELETE {path}")
+        else:
+            changes.append(f"DELETE (missing) {path}")
+        continue
+
+    p.parent.mkdir(parents=True, exist_ok=True)
+    with open(p, 'w', encoding='utf-8', newline='\n') as out:
+        out.write(content)
+    subprocess.run(["git","add",path], check=True)
+    changes.append(f"WRITE {path}")
+
+print("Applied changes:" if changes else "No FILE blocks found.")
+for c in changes: print("  ", c)
+
+# Save a summary for later steps
+with open('changes.txt','w',encoding='utf-8') as f:
+    for c in changes: f.write(c+"\n")
+PY
+
+      - name: Show changes summary
+        if: steps.detect.outputs.has_marker == 'true'
+        run: |
+          test -f changes.txt && cat changes.txt || echo "No changes captured."
+
+      - name: Create/refresh dev branch from main
+        if: steps.detect.outputs.has_marker == 'true'
+        run: |
+          set -e
+          if git ls-remote --exit-code --heads origin dev >/dev/null 2>&1; then
+            git fetch origin dev:dev
+            git checkout dev
+            git fetch origin main
+            git rebase origin/main || true
+          else
+            git checkout -B dev origin/main || git checkout -B dev main
+          fi
+
+      - name: Commit changes
+        if: steps.detect.outputs.has_marker == 'true'
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --staged --quiet; then
+            echo "No staged changes."
+          else
+            MSG="Apply ChatGPT FILES from issue #${{ github.event.issue.number }}"
+            git commit -m "$MSG"
+          fi
+
+      - name: Push dev
+        if: steps.detect.outputs.has_marker == 'true'
+        run: |
+          set -e
+          git push --force-with-lease origin dev
+
+      - name: Ensure PR dev -> main exists (update or create)
+        if: steps.detect.outputs.has_marker == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "== PR STEP START =="
+          git fetch origin main
+          git fetch origin dev
+          PRNUM=$(gh api -X GET "/repos/${GITHUB_REPOSITORY}/pulls?head=${{ github.repository_owner }}:dev&base=main&state=all" -q '.[0].number' || true)
+          TITLE="ChatGPT Files from Issue #${{ github.event.issue.number }}"
+          BODY=$'This PR was created automatically from a [CHATGPT FILES] submission.'
+          if [ -n "$PRNUM" ] && [ "$PRNUM" != "null" ]; then
+            gh api -X PATCH "/repos/${GITHUB_REPOSITORY}/pulls/$PRNUM" -f state=open -f title="$TITLE" -f body="$BODY" >/dev/null
+            echo "Updated PR #$PRNUM"
+          else
+            gh api -X POST "/repos/${GITHUB_REPOSITORY}/pulls" \
+              -f title="$TITLE" \
+              -f head="dev" \
+              -f base="main" \
+              -f body="$BODY" >/dev/null
+            echo "Created new PR from dev -> main"
+          fi
