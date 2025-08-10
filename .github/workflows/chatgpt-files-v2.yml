@@ -1,4 +1,4 @@
-﻿name: ChatGPT Files v2 Processor
+name: ChatGPT Files v2 Processor
 
 on:
   workflow_dispatch:
@@ -17,13 +17,18 @@ permissions:
   pull-requests: write
 
 jobs:
-  apply-files:
+  apply:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Ensure GitHub CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gh
 
       - name: Configure git identity
         run: |
@@ -53,6 +58,7 @@ jobs:
             jq -r '.issue.body // .comment.body // empty' "$GITHUB_EVENT_PATH" > body.txt || echo "" > body.txt
             echo "Loaded body from event payload."
           fi
+          sed -e 's/\r$//' -i body.txt
           echo "----- BODY (first 20 lines) -----"
           head -n 20 body.txt || true
           echo "---------------------------------"
@@ -61,92 +67,75 @@ jobs:
         id: detect
         run: |
           set -euo pipefail
-          if grep -iq '\[CHATGPT FILES v2\]' body.txt || grep -iq '\[CHATGPT FILES\]' body.txt; then
-            echo "has_marker=true" >> "$GITHUB_OUTPUT"
+          if grep -iq '^\[CHATGPT FILES v2\]' body.txt || grep -iq '^\[CHATGPT FILES\]' body.txt; then
+            echo "has=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_marker=false" >> "$GITHUB_OUTPUT"
+            echo "has=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Apply FILES v2 blocks
-        if: steps.detect.outputs.has_marker == 'true'
+      - name: Build and apply changes
+        if: steps.detect.outputs.has == 'true'
         run: |
           set -euo pipefail
-          python3 - << 'PY'
-import os, base64, pathlib, sys, subprocess
-body = open('body.txt','r',encoding='utf-8').read().replace('\r\n','\n')
+          awk '
+            BEGIN{
+              inblk=0; path=""; del=0; n=0; buflen=0;
+              print "#!/usr/bin/env bash"
+              print "set -euo pipefail"
+            }
+            function flush(){
+              if(!inblk) return;
+              p=path; d=del;
+              sub(/;delete$/,"",p)
+              gsub(/\047/,"'\''",p)
+              if(d){
+                print "echo DELETE " p
+                print "git rm -f -- " "\047" p "\047" " || true"
+              } else {
+                tag="EOF__" ++n
+                print "echo WRITE " p
+                print "mkdir -p -- \"$(dirname \047" p "\047)\""
+                print "cat > \047" p "\047 <<\047" tag "\047"
+                for(i=1;i<=buflen;i++) print buf[i]
+                print tag
+                print "git add -- " "\047" p "\047"
+              }
+              inblk=0; path=""; del=0; buflen=0
+            }
+            /^---file:/ && /---$/{
+              flush()
+              header=$0
+              sub(/^---file:/,"",header)
+              sub(/---$/,"",header)
+              gsub(/^[ \t]+|[ \t]+$/,"",header)
+              path=header; del=0
+              if(path ~ /;delete$/){ del=1 }
+              inblk=1; buflen=0
+              next
+            }
+            /^---endfile---$/{
+              flush(); next
+            }
+            {
+              if(inblk){ buf[++buflen]=$0 }
+            }
+            END{ flush() }
+          ' body.txt > apply.sh
 
-blocks=[]; path=None; opts={}; buf=[]
-for line in body.split('\n'):
-    if line.startswith('---file:') and line.rstrip().endswith('---'):
-        if path is not None:
-            print("ERROR: nested file blocks", file=sys.stderr); sys.exit(1)
-        header = line[len('---file:'):-3].strip()
-        parts = [p.strip() for p in header.split(';') if p.strip()]
-        if not parts: print("ERROR: empty file header", file=sys.stderr); sys.exit(1)
-        path = parts[0]; opts={}
-        for p in parts[1:]:
-            if '=' in p:
-                k,v = p.split('=',1); opts[k.strip().lower()] = v.strip()
-            else:
-                opts[p.strip().lower()] = True
-        buf=[]; continue
-    if line.strip() == '---endfile---':
-        if path is None: continue
-        content = '\n'.join(buf)
-        blocks.append((path, opts, content))
-        path=None; opts={}; buf=[]; continue
-    if path is not None:
-        buf.append(line)
+          chmod +x apply.sh
+          ./apply.sh
 
-changes=[]
-for p,opts,content in blocks:
-    p = p.strip()
-    if not p or p.startswith('/') or '..' in p.split('/'):
-        print(f"ERROR: unsafe path: {p}", file=sys.stderr); sys.exit(1)
-    pp = pathlib.Path(p)
-    delete = bool(opts.get('delete') or content.strip() == '__DELETE__')
-    enc = (opts.get('encoding') or '').lower()
-
-    if delete:
-        if pp.exists():
-            subprocess.run(['git','rm','-f',p], check=True)
-            changes.append(f'DELETE {p}')
-        else:
-            changes.append(f'DELETE (missing) {p}')
-        continue
-
-    if enc == 'base64':
-        data = base64.b64decode(content.encode('utf-8'))
-        pp.parent.mkdir(parents=True, exist_ok=True)
-        with open(pp,'wb') as f: f.write(data)
-    else:
-        pp.parent.mkdir(parents=True, exist_ok=True)
-        with open(pp,'w',encoding='utf-8',newline='\n') as f: f.write(content)
-    subprocess.run(['git','add',p], check=True)
-    changes.append(f'WRITE {p}')
-
-open('changes.txt','w',encoding='utf-8').write('\n'.join(changes))
-print('\n'.join(changes) if changes else 'No file blocks found.')
-PY
-
-      - name: Commit changes
-        if: steps.detect.outputs.has_marker == 'true'
-        run: |
-          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if git diff --staged --quiet; then
             echo "No staged changes."
           else
             git commit -m "Apply ChatGPT FILES v2"
+            git push --force-with-lease origin dev
           fi
 
-      - name: Push dev
-        if: steps.detect.outputs.has_marker == 'true'
-        run: |
-          set -e
-          git push --force-with-lease origin dev
-
       - name: Ensure PR dev -> main
-        if: steps.detect.outputs.has_marker == 'true'
+        if: steps.detect.outputs.has == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -155,10 +144,12 @@ PY
           AHEAD="$(git rev-list --left-right --count origin/main...origin/dev | awk '{print $2}' || echo 0)"
           if [ "${AHEAD:-0}" = "0" ]; then
             echo "Nothing to PR (dev==main)."; exit 0; fi
+
           PR="$(gh pr list --head dev --base main --state all --json number,state -q '.[0].number' || true)"
           STATE="$(gh pr list --head dev --base main --state all --json number,state -q '.[0].state' || true | tr '[:upper:]' '[:lower:]')"
           TITLE="ChatGPT Files v2"
           BODY="Automated PR from a [CHATGPT FILES v2] submission."
+
           if [ -n "$PR" ] && [ "$PR" != "null" ]; then
             if [ "$STATE" = "merged" ]; then
               gh api -X POST "/repos/${GITHUB_REPOSITORY}/pulls" -f title="$TITLE" -f head="dev" -f base="main" -f body="$BODY" >/dev/null
