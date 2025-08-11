@@ -1,9 +1,4 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
 import * as schema from "@shared/schema";
-
-neonConfig.webSocketConstructor = ws;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -11,5 +6,37 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle({ client: pool, schema });
+// Support local Postgres (localhost) using 'pg' + drizzle node-postgres adapter,
+// and Neon Serverless when using a Neon connection string. This avoids runtime
+// errors when running locally against Docker/Postgres.
+let pool: any;
+let db: any;
+
+/**
+ * Initialize database connections. This is async and must be awaited before
+ * using `db` or `pool`. Avoids top-level await so the file can be bundled.
+ */
+async function initDb() {
+  if (db && pool) return { pool, db };
+
+  if (process.env.DATABASE_URL.includes('localhost') || process.env.DATABASE_URL.includes('127.0.0.1')) {
+    // Local Postgres - use native pg client
+    const { Pool } = await import('pg');
+    const drizzleModule = await import('drizzle-orm/node-postgres');
+    pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    db = drizzleModule.drizzle(pool, { schema });
+  } else {
+    // Fallback to Neon serverless (websocket) for hosted environments
+    const { Pool: NeonPool, neonConfig } = await import('@neondatabase/serverless');
+    const { drizzle: neonDrizzle } = await import('drizzle-orm/neon-serverless');
+    const ws = (await import('ws')).default;
+    neonConfig.webSocketConstructor = ws;
+    pool = new NeonPool({ connectionString: process.env.DATABASE_URL });
+    db = neonDrizzle({ client: pool, schema });
+  }
+
+  return { pool, db };
+}
+
+export { pool, db, initDb };
+

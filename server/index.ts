@@ -1,10 +1,29 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
-import { BackgroundAdaptiveLearning } from "./background-adaptive-learning";
-import { continuousLearningScheduler } from "./continuous-learning-scheduler";
+// Routes are imported dynamically below. The full `routes` module performs
+// heavy initialization (ML engines, background workers) and will be skipped
+// when `SKIP_STARTUP_SERVICES` is enabled for local development.
+// `vite` helpers are only used in development. Avoid top-level import
+// so bundlers don't try to include Vite (a dev-only dependency).
+
+// Lightweight logger used during bundling; when running in a dev
+// environment the real `log` will be provided by the vite helper.
+function log(...args: any[]) {
+  console.log(...args);
+}
+// Background services are imported dynamically below to avoid heavy initialization
+// during module load. This prevents startup failures when network or other
+// external resources are unavailable in local development environments.
 import path from "path";
 import fs from "fs";
+import { initDb } from './db';
+
+// `import.meta.dirname` is not available after bundling. Provide a fallback
+// compatible with both Node ESM and bundled environments. Prefer a global
+// `importMetaDir` that may be injected by the packer runtime entrypoint.
+const importMetaDir = (typeof globalThis !== 'undefined' && (globalThis as any).importMetaDir)
+  || ((typeof __dirname !== 'undefined')
+    ? __dirname
+    : path.dirname(typeof import.meta !== 'undefined' && import.meta.url ? new URL(import.meta.url).pathname : process.cwd()));
 
 const app = express();
 app.use(express.json());
@@ -41,56 +60,97 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Register API routes FIRST
-  const server = await registerRoutes(app);
+  // Register API routes FIRST (dynamic import to avoid heavy startup work)
+  const SKIP_STARTUP_SERVICES = (process.env.SKIP_STARTUP_SERVICES ?? '').toLowerCase() === '1' || (process.env.SKIP_STARTUP_SERVICES ?? '').toLowerCase() === 'true';
 
-  // Start continuous learning scheduler for automated model retraining
+  let server: any;
+  // Ensure DB is initialized before loading modules that may use it
   try {
+    await initDb();
+    log('✅ [DB] Database connection initialized');
+  } catch (err) {
+    log(`⚠️ [DB] Failed to initialize database: ${err}`);
+  }
+  if (!SKIP_STARTUP_SERVICES) {
+    const { registerRoutes } = await import('./routes');
+    server = await registerRoutes(app);
+  } else {
+    const { registerMinimalRoutes } = await import('./routes-minimal');
+    server = await registerMinimalRoutes(app);
+  }
+
+  // Start continuous learning scheduler for automated model retraining (dynamic import)
+  if (!SKIP_STARTUP_SERVICES) {
+  try {
+    const { continuousLearningScheduler } = await import('./continuous-learning-scheduler');
     continuousLearningScheduler.start();
     log('✅ [CONTINUOUS LEARNING] Automated learning scheduler started successfully');
   } catch (error) {
     log(`❌ [CONTINUOUS LEARNING] Failed to start scheduler: ${error}`);
   }
+  } else {
+    log('⚠️ [STARTUP] SKIP_STARTUP_SERVICES enabled — skipping continuous learning scheduler');
+  }
 
   // Start forecast performance tracking worker
-  try {
-    const { default: forecastWorker } = await import('./forecast-background-worker');
-    log('✅ [FORECAST TRACKER] Background forecast processing started successfully');
-  } catch (error) {
-    log(`❌ [FORECAST TRACKER] Failed to start forecast worker: ${error}`);
+  if (!SKIP_STARTUP_SERVICES) {
+    try {
+      const { default: forecastWorker } = await import('./forecast-background-worker');
+      log('✅ [FORECAST TRACKER] Background forecast processing started successfully');
+    } catch (error) {
+      log(`❌ [FORECAST TRACKER] Failed to start forecast worker: ${error}`);
+    }
+  } else {
+    log('⚠️ [STARTUP] SKIP_STARTUP_SERVICES enabled — skipping forecast worker');
   }
 
   // Start learning feedback test
-  try {
-    await import('./test-learning-feedback');
-    log('✅ [LEARNING TEST] Learning feedback test initialized - will trigger accuracy-based learning');
-  } catch (error) {
-    log(`❌ [LEARNING TEST] Failed to start learning test: ${error}`);
+  if (!SKIP_STARTUP_SERVICES) {
+    try {
+      await import('./test-learning-feedback');
+      log('✅ [LEARNING TEST] Learning feedback test initialized - will trigger accuracy-based learning');
+    } catch (error) {
+      log(`❌ [LEARNING TEST] Failed to start learning test: ${error}`);
+    }
+  } else {
+    log('⚠️ [STARTUP] SKIP_STARTUP_SERVICES enabled — skipping learning test');
   }
 
   // Start manual learning demonstration
-  try {
-    await import('./manual-learning-trigger');
-    log('✅ [LEARNING DEMO] Manual learning demonstration initialized - will show dramatic learning patterns');
-  } catch (error) {
-    log(`❌ [LEARNING DEMO] Failed to start learning demo: ${error}`);
+  if (!SKIP_STARTUP_SERVICES) {
+    try {
+      await import('./manual-learning-trigger');
+      log('✅ [LEARNING DEMO] Manual learning demonstration initialized - will show dramatic learning patterns');
+    } catch (error) {
+      log(`❌ [LEARNING DEMO] Failed to start learning demo: ${error}`);
+    }
+  } else {
+    log('⚠️ [STARTUP] SKIP_STARTUP_SERVICES enabled — skipping learning demo');
   }
 
   // Start comprehensive learning validation test
-  try {
-    await import('./test-learning-validation');
-    log('✅ [LEARNING VALIDATION] Comprehensive learning test initialized - will validate actual learning behavior');
-  } catch (error) {
-    log(`❌ [LEARNING VALIDATION] Failed to start learning validation: ${error}`);
+  if (!SKIP_STARTUP_SERVICES) {
+    try {
+      await import('./test-learning-validation');
+      log('✅ [LEARNING VALIDATION] Comprehensive learning test initialized - will validate actual learning behavior');
+    } catch (error) {
+      log(`❌ [LEARNING VALIDATION] Failed to start learning validation: ${error}`);
+    }
+  } else {
+    log('⚠️ [STARTUP] SKIP_STARTUP_SERVICES enabled — skipping learning validation');
   }
 
   // Start trade completion monitoring
-  try {
-    const { TradeCompletionMonitor } = await import('./trade-completion-monitor');
-    TradeCompletionMonitor.start();
-    log('✅ [STARTUP] Trade completion monitoring started successfully');
-  } catch (error) {
-    log(`❌ [STARTUP] Failed to start trade completion monitoring: ${error}`);
+  if (!SKIP_STARTUP_SERVICES) {
+    try {
+      const { TradeCompletionMonitor } = await import('./trade-completion-monitor');
+      TradeCompletionMonitor.start();
+      log('✅ [STARTUP] Trade completion monitoring started successfully');
+    } catch (error) {
+      log(`❌ [STARTUP] Failed to start trade completion monitoring: ${error}`);
+    }
+  } else {
+    log('⚠️ [STARTUP] SKIP_STARTUP_SERVICES enabled — skipping trade completion monitoring');
   }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -103,7 +163,7 @@ app.use((req, res, next) => {
 
   // Serve static files for production
   log("Serving built static files (production mode)");
-  const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
+  const distPath = path.resolve(importMetaDir, "..", "dist", "public");
   log(`Looking for build directory at: ${distPath}`);
   
   if (fs.existsSync(distPath)) {
@@ -118,10 +178,15 @@ app.use((req, res, next) => {
     await setupVite(app, server);
   }
 
-  // Start background adaptive learning service
-  const backgroundAdaptiveLearning = new BackgroundAdaptiveLearning();
-  await backgroundAdaptiveLearning.start();
-  log("🧠 [STARTUP] Background adaptive learning service started");
+  // Start background adaptive learning service (dynamic import)
+  try {
+    const { BackgroundAdaptiveLearning } = await import('./background-adaptive-learning');
+    const backgroundAdaptiveLearning = new BackgroundAdaptiveLearning();
+    await backgroundAdaptiveLearning.start();
+    log("🧠 [STARTUP] Background adaptive learning service started");
+  } catch (error) {
+    log(`⚠️ [STARTUP] Background adaptive learning service failed to start: ${error}`);
+  }
 
   // Start continuous aggressive backfill service for faster data accumulation
   const { continuousAggressiveBackfillService } = await import("./continuous-aggressive-backfill-service");
@@ -172,46 +237,70 @@ app.use((req, res, next) => {
   }, 25000); // Start after 25 seconds to allow other services first
 
   // Start ML training data sampler
-  try {
-    const { mlTrainingDataSampler } = await import('./ml-training-data-sampler');
-    log("🧠 [STARTUP] ML training data sampler service started");
-  } catch (error) {
-    log("⚠️ [STARTUP] Failed to start ML training data sampler:", String(error));
+  if (!SKIP_STARTUP_SERVICES) {
+    try {
+      const { mlTrainingDataSampler } = await import('./ml-training-data-sampler');
+      log("🧠 [STARTUP] ML training data sampler service started");
+    } catch (error) {
+      log("⚠️ [STARTUP] Failed to start ML training data sampler:", String(error));
+    }
+  } else {
+    log('⚠️ [STARTUP] SKIP_STARTUP_SERVICES enabled — skipping ML training data sampler');
   }
 
   // Start Trade Completion Monitor for real-time TP/SL detection
-  try {
-    const { TradeCompletionMonitor } = await import('./trade-completion-monitor');
-    TradeCompletionMonitor.start();
-    log("🎯 [STARTUP] Trade Completion Monitor started - real-time TP/SL detection every 10 seconds");
-  } catch (error) {
-    log("❌ [STARTUP] Failed to start Trade Completion Monitor:", String(error));
+  if (!SKIP_STARTUP_SERVICES) {
+    try {
+      const { TradeCompletionMonitor } = await import('./trade-completion-monitor');
+      TradeCompletionMonitor.start();
+      log("🎯 [STARTUP] Trade Completion Monitor started - real-time TP/SL detection every 10 seconds");
+    } catch (error) {
+      log("❌ [STARTUP] Failed to start Trade Completion Monitor:", String(error));
+    }
+  } else {
+    log('⚠️ [STARTUP] SKIP_STARTUP_SERVICES enabled — skipping Trade Completion Monitor');
   }
 
   // Start Trade Expiration Service for 20-minute timeout handling
-  try {
-    const { TradeExpirationService } = await import('./trade-expiration-service');
-    TradeExpirationService.start();
-    log("⏰ [STARTUP] Trade Expiration Service started - timeout monitoring every 30 seconds");
-  } catch (error) {
-    log("❌ [STARTUP] Failed to start Trade Expiration Service:", String(error));
+  if (!SKIP_STARTUP_SERVICES) {
+    try {
+      const { TradeExpirationService } = await import('./trade-expiration-service');
+      TradeExpirationService.start();
+      log("⏰ [STARTUP] Trade Expiration Service started - timeout monitoring every 30 seconds");
+    } catch (error) {
+      log("❌ [STARTUP] Failed to start Trade Expiration Service:", String(error));
+    }
+  } else {
+    log('⚠️ [STARTUP] SKIP_STARTUP_SERVICES enabled — skipping Trade Expiration Service');
   }
 
   // Background ML filtering is now handled by the dynamic live ML engine
 
   // Initialize Coinbase historical data before starting Dynamic Live ML Engine
-  log("🔧 [STARTUP] Initializing Coinbase historical data...");
-  const { coinbaseHistoricalInit } = await import('./coinbase-historical-initialization');
-  await coinbaseHistoricalInit.initializeHistoricalData();
-  log("✅ [STARTUP] Coinbase historical data initialization completed");
+  if (!SKIP_STARTUP_SERVICES) {
+    log("🔧 [STARTUP] Initializing Coinbase historical data...");
+    try {
+      const { coinbaseHistoricalInit } = await import('./coinbase-historical-initialization');
+      await coinbaseHistoricalInit.initializeHistoricalData();
+      log("✅ [STARTUP] Coinbase historical data initialization completed");
+    } catch (error) {
+      log(`⚠️ [STARTUP] Coinbase historical initialization failed: ${error}`);
+    }
 
-  // Start Dynamic Live ML Engine with auto-restart
-  log("🔍 [STARTUP] About to import Dynamic Live ML Engine...");
-  const { dynamicLiveMLEngine } = await import('./dynamic-live-ml-engine');
-  log("🔍 [STARTUP] Dynamic Live ML Engine imported successfully");
-  log("🔍 [STARTUP] About to call startWithAutoRestart()...");
-  await dynamicLiveMLEngine.startWithAutoRestart();
-  log("🚀 [STARTUP] Dynamic Live ML Engine started with auto-restart");
+    // Start Dynamic Live ML Engine with auto-restart
+    try {
+      log("🔍 [STARTUP] About to import Dynamic Live ML Engine...");
+      const { dynamicLiveMLEngine } = await import('./dynamic-live-ml-engine');
+      log("🔍 [STARTUP] Dynamic Live ML Engine imported successfully");
+      log("🔍 [STARTUP] About to call startWithAutoRestart()...");
+      await dynamicLiveMLEngine.startWithAutoRestart();
+      log("🚀 [STARTUP] Dynamic Live ML Engine started with auto-restart");
+    } catch (error) {
+      log(`⚠️ [STARTUP] Dynamic Live ML Engine failed to start: ${error}`);
+    }
+  } else {
+    log('⚠️ [STARTUP] SKIP_STARTUP_SERVICES enabled — skipping historical data init and ML engine');
+  }
 
   // Start server
   const port = parseInt(process.env.PORT ?? '5000', 10);

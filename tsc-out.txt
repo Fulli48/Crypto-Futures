@@ -1,0 +1,483 @@
+server/api-routes.ts(37,16): error TS18046: 'error' is of type 'unknown'.
+server/api-routes.ts(59,16): error TS18046: 'error' is of type 'unknown'.
+server/api-routes.ts(77,56): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/api-routes.ts(91,16): error TS18046: 'error' is of type 'unknown'.
+server/api-routes.ts(108,15): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/api-routes.ts(109,15): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/api-routes.ts(123,16): error TS18046: 'error' is of type 'unknown'.
+server/api-routes.ts(139,15): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/api-routes.ts(140,14): error TS7006: Parameter 'a' implicitly has an 'any' type.
+server/api-routes.ts(140,17): error TS7006: Parameter 'b' implicitly has an 'any' type.
+server/api-routes.ts(143,50): error TS7006: Parameter 'cycle' implicitly has an 'any' type.
+server/api-routes.ts(164,16): error TS18046: 'error' is of type 'unknown'.
+server/api-routes.ts(197,16): error TS18046: 'error' is of type 'unknown'.
+server/apply-chart-data-migration.ts(11,23): error TS2323: Cannot redeclare exported variable 'applyChartDataMigration'.
+server/apply-chart-data-migration.ts(58,10): error TS2323: Cannot redeclare exported variable 'applyChartDataMigration'.
+server/apply-chart-data-migration.ts(58,10): error TS2484: Export declaration conflicts with exported declaration of 'applyChartDataMigration'.
+server/batch-api-optimizer.ts(1,8): error TS2613: Module '"C:/Users/RadDo/Crypto-Futures/server/real-price-api"' has no default export. Did you mean to use 'import { realPriceAPI } from "C:/Users/RadDo/Crypto-Futures/server/real-price-api"' instead?
+server/coinbase-historical-initialization.ts(63,17): error TS7006: Parameter 'results' implicitly has an 'any' type.
+server/coinbase-historical-initialization.ts(108,46): error TS2551: Property 'fetchRealPriceData' does not exist on type 'RealPriceAPI'. Did you mean 'fetchRealPrices'?
+server/coinbase-historical-initialization.ts(192,16): error TS18046: 'insertError' is of type 'unknown'.
+server/coinbase-historical-initialization.ts(192,63): error TS18046: 'insertError' is of type 'unknown'.
+server/comprehensive-data-validator.ts(304,73): error TS2345: Argument of type '{ operation: string; symbol: string; updates: string[]; timestamp: Date; }' is not assignable to parameter of type 'number'.
+server/comprehensive-data-validator.ts(337,30): error TS7006: Parameter 'code' implicitly has an 'any' type.
+server/comprehensive-data-validator.ts(347,31): error TS7006: Parameter 'code' implicitly has an 'any' type.
+server/comprehensive-indicator-corrector.ts(62,34): error TS7006: Parameter 'record' implicitly has an 'any' type.
+server/continuous-aggressive-backfill-service.ts(364,54): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/continuous-aggressive-backfill-service.ts(365,52): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/continuous-aggressive-backfill-service.ts(366,50): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/continuous-learning-scheduler.ts(161,14): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "created_at"; tableName: "ml_training_samples"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>, right: Date | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'Date | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string>, right: string | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "created_at"; tableName: "ml_training_samples"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'Aliased<string>'.
+      Type 'PgColumn<{ name: "created_at"; tableName: "ml_training_samples"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is missing the following properties from type 'Aliased<string>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "created_at"; tableName: "ml_training_samples"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'never'.
+server/continuous-learning-scheduler.ts(278,13): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "created_at"; tableName: "persistent_forecasts"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>, right: Date | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'Date | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string>, right: string | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "created_at"; tableName: "persistent_forecasts"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'Aliased<string>'.
+      Type 'PgColumn<{ name: "created_at"; tableName: "persistent_forecasts"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is missing the following properties from type 'Aliased<string>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "created_at"; tableName: "persistent_forecasts"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'never'.
+server/continuous-learning-scheduler.ts(526,13): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "created_at"; tableName: "persistent_forecasts"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>, right: Date | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'Date | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string>, right: string | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "created_at"; tableName: "persistent_forecasts"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'Aliased<string>'.
+      Type 'PgColumn<{ name: "created_at"; tableName: "persistent_forecasts"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is missing the following properties from type 'Aliased<string>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "created_at"; tableName: "persistent_forecasts"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'never'.
+server/data-cleanup-service.ts(34,36): error TS2339: Property 'status' does not exist on type 'PgTableWithColumns<{ name: "trade_simulations"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "trade_simulations"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 44 more .....'.
+server/data-cleanup-service.ts(209,36): error TS2339: Property 'status' does not exist on type 'PgTableWithColumns<{ name: "trade_simulations"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "trade_simulations"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 44 more .....'.
+server/data-validation.ts(305,54): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/data-validation.ts(319,65): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/database-migration-service.ts(19,14): error TS2339: Property 'info' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(25,14): error TS2339: Property 'info' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(28,14): error TS2339: Property 'error' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(38,14): error TS2339: Property 'info' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(53,14): error TS2339: Property 'info' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(56,14): error TS2339: Property 'error' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(66,14): error TS2339: Property 'info' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(110,14): error TS2339: Property 'info' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(113,14): error TS2339: Property 'error' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(123,14): error TS2339: Property 'info' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(147,14): error TS2339: Property 'info' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(150,14): error TS2339: Property 'error' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(214,14): error TS2339: Property 'error' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(224,14): error TS2339: Property 'warn' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(241,14): error TS2339: Property 'warn' does not exist on type 'LoggingService'.
+server/database-migration-service.ts(244,14): error TS2339: Property 'error' does not exist on type 'LoggingService'.
+server/db.ts(17,20): error TS1378: Top-level 'await' expressions are only allowed when the 'module' option is set to 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', 'nodenext', or 'preserve', and the 'target' option is set to 'es2017' or higher.
+server/db.ts(18,25): error TS1378: Top-level 'await' expressions are only allowed when the 'module' option is set to 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', 'nodenext', or 'preserve', and the 'target' option is set to 'es2017' or higher.
+server/db.ts(23,42): error TS1378: Top-level 'await' expressions are only allowed when the 'module' option is set to 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', 'nodenext', or 'preserve', and the 'target' option is set to 'es2017' or higher.
+server/db.ts(24,36): error TS1378: Top-level 'await' expressions are only allowed when the 'module' option is set to 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', 'nodenext', or 'preserve', and the 'target' option is set to 'es2017' or higher.
+server/db.ts(25,15): error TS1378: Top-level 'await' expressions are only allowed when the 'module' option is set to 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', 'nodenext', or 'preserve', and the 'target' option is set to 'es2017' or higher.
+server/db.ts(25,28): error TS7016: Could not find a declaration file for module 'ws'. 'C:/Users/RadDo/Crypto-Futures/node_modules/ws/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/ws` if it exists or add a new declaration (.d.ts) file containing `declare module 'ws';`
+server/db.ts(28,22): error TS2353: Object literal may only specify known properties, and 'client' does not exist in type 'NeonClient'.
+server/dynamic-live-ml-engine.ts(58,28): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/dynamic-live-ml-engine.ts(79,43): error TS2554: Expected 3 arguments, but got 2.
+server/dynamic-live-ml-engine.ts(669,45): error TS2339: Property 'volatility' does not exist on type '{ symbol: string; id: number; createdAt: Date; updatedAt: Date; timestamp: Date; open: string; high: string; low: string; close: string; volume: string; fundingRate: string | null; ... 34 more ...; source: string; }'.
+server/enhanced-chart-ingestion-service.ts(5,10): error TS2724: '"./technical-indicators-service"' has no exported member named 'technicalIndicatorsService'. Did you mean 'TechnicalIndicatorsService'?
+server/enhanced-chart-ingestion-service.ts(126,37): error TS2339: Property 'technicalIndicators' does not exist on type 'EnhancedChartIngestionService'.
+server/enhanced-chart-ingestion-service.ts(188,43): error TS2339: Property 'technicalIndicators' does not exist on type 'EnhancedChartIngestionService'.
+server/enhanced-chart-ingestion-service.ts(291,69): error TS7006: Parameter 'row' implicitly has an 'any' type.
+server/enhanced-chart-ingestion-service.ts(336,41): error TS2339: Property 'technicalIndicators' does not exist on type 'EnhancedChartIngestionService'.
+server/enhanced-chart-ingestion-service.ts(388,49): error TS7006: Parameter 'row' implicitly has an 'any' type.
+server/enhanced-chart-ingestion-service.ts(397,31): error TS7006: Parameter 'row' implicitly has an 'any' type.
+server/enhanced-chart-ingestion-service.ts(458,39): error TS2551: Property 'fetchOHLCVData' does not exist on type 'RealPriceAPI'. Did you mean 'fetchRealOHLCVData'?
+server/enhanced-chart-ingestion-service.ts(478,40): error TS2551: Property 'fetchOHLCVData' does not exist on type 'RealPriceAPI'. Did you mean 'fetchRealOHLCVData'?
+server/enhanced-chart-ingestion-service.ts(503,48): error TS7006: Parameter 'row' implicitly has an 'any' type.
+server/enhanced-chart-ingestion-service.ts(602,42): error TS7006: Parameter 'r' implicitly has an 'any' type.
+server/enhanced-chart-ingestion-service.ts(611,46): error TS7006: Parameter 'r' implicitly has an 'any' type.
+server/enhanced-chart-ingestion-service.ts(692,38): error TS7006: Parameter 'r' implicitly has an 'any' type.
+server/enhanced-data-ingestion.ts(223,26): error TS2339: Property 'open' does not exist on type 'never'.
+server/enhanced-data-ingestion.ts(223,45): error TS2339: Property 'close' does not exist on type 'never'.
+server/enhanced-data-ingestion.ts(224,26): error TS2339: Property 'high' does not exist on type 'never'.
+server/enhanced-data-ingestion.ts(224,45): error TS2339: Property 'close' does not exist on type 'never'.
+server/enhanced-data-ingestion.ts(225,25): error TS2339: Property 'low' does not exist on type 'never'.
+server/enhanced-data-ingestion.ts(225,43): error TS2339: Property 'close' does not exist on type 'never'.
+server/enhanced-data-ingestion.ts(226,27): error TS2339: Property 'close' does not exist on type 'never'.
+server/enhanced-data-ingestion.ts(227,28): error TS2339: Property 'volume' does not exist on type 'never'.
+server/enhanced-data-ingestion.ts(308,37): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/enhanced-data-ingestion.ts(494,17): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: Column<ColumnBaseConfig<ColumnDataType, string>, object, object>, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'Date' is not assignable to parameter of type 'Column<ColumnBaseConfig<ColumnDataType, string>, object, object>'.
+      Type 'Date' is missing the following properties from type 'Column<ColumnBaseConfig<ColumnDataType, string>, object, object>': table, _, name, primary, and 16 more.
+  Overload 2 of 3, '(left: Aliased<PgColumn<{ name: "timestamp"; tableName: "rolling_chart_data"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>>, right: SQLWrapper | PgColumn<...>): SQL<...>', gave the following error.
+    Argument of type 'Date' is not assignable to parameter of type 'Aliased<PgColumn<{ name: "timestamp"; tableName: "rolling_chart_data"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>>'.
+      Type 'Date' is missing the following properties from type 'Aliased<PgColumn<{ name: "timestamp"; tableName: "rolling_chart_data"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>>': sql, fieldAlias, _, getSQL
+  Overload 3 of 3, '(left: SQLWrapper, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'Date' is not assignable to parameter of type 'SQLWrapper'.
+      Property 'getSQL' is missing in type 'Date' but required in type 'SQLWrapper'.
+server/enhanced-forecast-learner.ts(52,44): error TS7006: Parameter 'row' implicitly has an 'any' type.
+server/enhanced-forecast-learner.ts(53,45): error TS7006: Parameter 'row' implicitly has an 'any' type.
+server/enhanced-forecast-learner.ts(63,23): error TS7006: Parameter 'row' implicitly has an 'any' type.
+server/enhanced-forecast-learner.ts(74,43): error TS7006: Parameter 'row' implicitly has an 'any' type.
+server/enhanced-forecast-learner.ts(78,13): error TS7006: Parameter 'row' implicitly has an 'any' type.
+server/enhanced-forecast-learner.ts(195,50): error TS7006: Parameter 'row' implicitly has an 'any' type.
+server/enhanced-forecast-learner.ts(305,47): error TS7006: Parameter 'row' implicitly has an 'any' type.
+server/enhanced-trading-engine.ts(296,52): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/enhanced-trading-engine.ts(304,52): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/enhanced-trading-engine.ts(304,57): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/forecast-background-worker.ts(83,47): error TS2339: Property 'currentPrice' does not exist on type 'PgTableWithColumns<{ name: "cryptocurrencies"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "cryptocurrencies"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 7 more ...; ...'.
+server/forecast-learning-engine.ts(78,34): error TS2551: Property 'isCompleted' does not exist on type 'PgTableWithColumns<{ name: "forecast_performance"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "forecast_performance"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 15 m...'. Did you mean 'is_completed'?
+server/forecast-learning-engine.ts(138,50): error TS2339: Property 'predictedPrice' does not exist on type '{ symbol: string; id: number; createdAt: Date; confidence: number; is_successful: boolean | null; market_conditions: unknown; forecast_timestamp: Date; initial_price: string; forecast_price: string; ... 7 more ...; is_completed: boolean; }'.
+server/forecast-learning-engine.ts(139,47): error TS2551: Property 'actualPrice' does not exist on type '{ symbol: string; id: number; createdAt: Date; confidence: number; is_successful: boolean | null; market_conditions: unknown; forecast_timestamp: Date; initial_price: string; forecast_price: string; ... 7 more ...; is_completed: boolean; }'. Did you mean 'actual_price'?
+server/forecast-learning-engine.ts(140,49): error TS2339: Property 'originalPrice' does not exist on type '{ symbol: string; id: number; createdAt: Date; confidence: number; is_successful: boolean | null; market_conditions: unknown; forecast_timestamp: Date; initial_price: string; forecast_price: string; ... 7 more ...; is_completed: boolean; }'.
+server/forecast-performance-tracker.ts(11,15): error TS2724: '"@shared/schema"' has no exported member named 'InsertForecastPerformance'. Did you mean 'InsertForecastPerformanceData'?
+server/forecast-performance-tracker.ts(11,42): error TS2724: '"@shared/schema"' has no exported member named 'ForecastPerformance'. Did you mean 'forecastPerformance'?
+server/forecast-performance-tracker.ts(173,16): error TS7006: Parameter 'a' implicitly has an 'any' type.
+server/forecast-performance-tracker.ts(173,19): error TS7006: Parameter 'b' implicitly has an 'any' type.
+server/forecast-performance-tracker.ts(178,55): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/forecast-performance-tracker.ts(178,60): error TS7006: Parameter 'f' implicitly has an 'any' type.
+server/forecast-performance-tracker.ts(179,56): error TS7006: Parameter 'f' implicitly has an 'any' type.
+server/forecast-performance-tracker.ts(186,54): error TS7006: Parameter 'f' implicitly has an 'any' type.
+server/forecast-performance-tracker.ts(194,26): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/forecast-performance-tracker.ts(194,31): error TS7006: Parameter 'f' implicitly has an 'any' type.
+server/forecast-performance-tracker.ts(255,38): error TS7006: Parameter 'f' implicitly has an 'any' type.
+server/forecast-tracking-worker.ts(103,37): error TS2339: Property 'updateForecastPoint' does not exist on type 'EnhancedForecastLearner'.
+server/historical-backfill-service.ts(257,86): error TS7006: Parameter 'r' implicitly has an 'any' type.
+server/historical-backfill-service.ts(269,85): error TS7006: Parameter 'r' implicitly has an 'any' type.
+server/historical-backfill-service.ts(270,84): error TS7006: Parameter 'r' implicitly has an 'any' type.
+server/historical-backfill-service.ts(450,34): error TS7006: Parameter 'r' implicitly has an 'any' type.
+server/historical-backfill-service.ts(451,33): error TS7006: Parameter 'r' implicitly has an 'any' type.
+server/historical-backfill-service.ts(452,32): error TS7006: Parameter 'r' implicitly has an 'any' type.
+server/historical-data-backfill-service.ts(1,10): error TS2305: Module '"./storage"' has no exported member 'db'.
+server/historical-data-backfill-service.ts(59,43): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/historical-trade-completion-processor.ts(104,28): error TS7006: Parameter 'data' implicitly has an 'any' type.
+server/historical-trade-completion-processor.ts(328,53): error TS2345: Argument of type 'number | "0"' is not assignable to parameter of type 'string'.
+  Type 'number' is not assignable to type 'string'.
+server/ideal-entry-calculator.ts(225,14): error TS18047: 'currentPrice' is possibly 'null'.
+server/ideal-entry-calculator.ts(253,24): error TS18047: 'currentPrice' is possibly 'null'.
+server/immediate-60-minute-data-generator.ts(95,11): error TS2353: Object literal may only specify known properties, and 'volatility' does not exist in type '{ symbol: string; timestamp?: unknown; open?: unknown; high?: unknown; low?: unknown; close?: unknown; volume?: unknown; fundingRate?: unknown; nextFundingTime?: unknown; openInterest?: unknown; openInterestChange?: unknown; tradeCount?: unknown; buyVolume?: unknown; sellVolume?: unknown; avgTradeSize?: unknown; lar...'.
+server/index.ts(18,27): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'.
+server/index.ts(18,58): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'.
+server/index.ts(18,84): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'.
+server/learning-etl-pipeline.ts(100,26): error TS18046: 'error' is of type 'unknown'.
+server/learning-etl-pipeline.ts(365,25): error TS2304: Cannot find name 'learningDataset'.
+server/learning-etl-pipeline.ts(369,36): error TS18046: 'error' is of type 'unknown'.
+server/learning-etl-pipeline.ts(390,10): error TS2554: Expected 1 arguments, but got 2.
+server/manual-60-minute-backfill.ts(78,46): error TS2551: Property 'fetchRealPriceData' does not exist on type 'RealPriceAPI'. Did you mean 'fetchRealPrices'?
+server/mass-trade-data-backfill-service.ts(55,47): error TS7006: Parameter 'acc' implicitly has an 'any' type.
+server/mass-trade-data-backfill-service.ts(55,52): error TS7006: Parameter 'record' implicitly has an 'any' type.
+server/ml-diagnostics-service.ts(208,16): error TS2339: Property 'or' does not exist on type 'SQL<unknown>'.
+server/ml-diagnostics-service.ts(221,52): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/ml-diagnostics-service.ts(229,45): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/ml-diagnostics-service.ts(229,50): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/ml-diagnostics-service.ts(234,56): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/ml-diagnostics-service.ts(307,9): error TS2454: Variable 'regimeThreshold' is used before being assigned.
+server/ml-diagnostics-service.ts(308,9): error TS2454: Variable 'regimeValue' is used before being assigned.
+server/ml-diagnostics-service.ts(322,48): error TS18046: 'error' is of type 'unknown'.
+server/ml-diagnostics-service.ts(322,65): error TS18046: 'error' is of type 'unknown'.
+server/ml-diagnostics-service.ts(434,15): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ MLTradeSignalEngine: string; SelfImprovingMLEngine: string; TradeCompletionMonitor: string; }'.
+  No index signature with a parameter of type 'string' was found on type '{ MLTradeSignalEngine: string; SelfImprovingMLEngine: string; TradeCompletionMonitor: string; }'.
+server/ml-diagnostics-service.ts(434,46): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ training_cycle: string; regime_change: string; error_alert: string; performance_update: string; }'.
+  No index signature with a parameter of type 'string' was found on type '{ training_cycle: string; regime_change: string; error_alert: string; performance_update: string; }'.
+server/ml-diagnostics-service.ts(445,12): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(446,9): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(455,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(456,59): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(457,56): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(458,44): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(460,12): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(460,70): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(461,9): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(480,12): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(480,47): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(481,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(484,12): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(484,55): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(485,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(488,12): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(488,52): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-diagnostics-service.ts(489,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+server/ml-forecast-engine.ts(113,37): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/ml-trade-signal-engine.ts(844,31): error TS7016: Could not find a declaration file for module 'ws'. 'C:/Users/RadDo/Crypto-Futures/node_modules/ws/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/ws` if it exists or add a new declaration (.d.ts) file containing `declare module 'ws';`
+server/ml-trade-signal-engine.ts(1247,9): error TS2353: Object literal may only specify known properties, and 'avgProfitLikelihood' does not exist in type '{ successRate: number; avgSuccessScore: number; sampleSize: number; lastUpdated: number; longSuccessRate?: number | undefined; shortSuccessRate?: number | undefined; recentSuccessRates: number[]; ... 10 more ...; uncertaintyMetrics: { ...; }; }'.
+server/ml-trade-signal-engine.ts(1609,39): error TS7006: Parameter 'w' implicitly has an 'any' type.
+server/ml-trade-signal-engine.ts(1686,31): error TS7016: Could not find a declaration file for module 'ws'. 'C:/Users/RadDo/Crypto-Futures/node_modules/ws/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/ws` if it exists or add a new declaration (.d.ts) file containing `declare module 'ws';`
+server/ml-trade-signal-engine.ts(1697,30): error TS2353: Object literal may only specify known properties, and 'client' does not exist in type 'NeonClient'.
+server/ml-trade-signal-engine.ts(1789,7): error TS2740: Type '{ successRate: number; avgSuccessScore: number; sampleSize: number; lastUpdated: number; longSuccessRate: number; shortSuccessRate: number; }' is missing the following properties from type '{ successRate: number; avgSuccessScore: number; sampleSize: number; lastUpdated: number; longSuccessRate?: number | undefined; shortSuccessRate?: number | undefined; recentSuccessRates: number[]; ... 10 more ...; uncertaintyMetrics: { ...; }; }': recentSuccessRates, longSuccessRates, shortSuccessRates, recentConfidences, and 8 more.
+server/ml-trade-signal-engine.ts(1952,7): error TS1117: An object literal cannot have multiple properties with the same name.
+server/ml-trade-signal-engine.ts(2462,9): error TS2353: Object literal may only specify known properties, and 'mlEnhancementData' does not exist in type '{ signal: "SHORT" | "LONG" | "WAIT"; confidence: number; profitLikelihood: number; entryPrice: number; takeProfit: number; stopLoss: number; riskRewardRatio: number; modelExplanation: string; featureImportance: Record<...>; wasFiltered?: boolean | undefined; filterReason?: string | undefined; adaptiveThresholds?: { ...'.
+server/ml-trade-signal-engine.ts(2500,11): error TS2393: Duplicate function implementation.
+server/ml-trade-signal-engine.ts(2602,23): error TS2339: Property 'rsi' does not exist on type 'number[]'.
+server/ml-trade-signal-engine.ts(2603,24): error TS2339: Property 'macd' does not exist on type 'number[]'.
+server/ml-trade-signal-engine.ts(2604,30): error TS2339: Property 'volatility' does not exist on type 'number[]'.
+server/ml-trade-signal-engine.ts(2605,30): error TS2339: Property 'stochastic' does not exist on type 'number[]'.
+server/ml-trade-signal-engine.ts(2606,26): error TS2339: Property 'volume' does not exist on type 'number[]'.
+server/ml-trade-signal-engine.ts(2945,19): error TS7053: Element implicitly has an 'any' type because expression of type '4' can't be used to index type 'Promise<number[]>'.
+  Property '4' does not exist on type 'Promise<number[]>'.
+server/ml-trade-signal-engine.ts(2946,20): error TS7053: Element implicitly has an 'any' type because expression of type '5' can't be used to index type 'Promise<number[]>'.
+  Property '5' does not exist on type 'Promise<number[]>'.
+server/ml-trade-signal-engine.ts(2947,26): error TS7053: Element implicitly has an 'any' type because expression of type '1' can't be used to index type 'Promise<number[]>'.
+  Property '1' does not exist on type 'Promise<number[]>'.
+server/ml-trade-signal-engine.ts(3047,53): error TS7006: Parameter 'p' implicitly has an 'any' type.
+server/ml-trade-signal-engine.ts(3202,52): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/ml-trade-signal-engine.ts(3247,19): error TS7053: Element implicitly has an 'any' type because expression of type '0' can't be used to index type 'Promise<number[]>'.
+  Property '0' does not exist on type 'Promise<number[]>'.
+server/ml-trade-signal-engine.ts(3248,20): error TS7053: Element implicitly has an 'any' type because expression of type '1' can't be used to index type 'Promise<number[]>'.
+  Property '1' does not exist on type 'Promise<number[]>'.
+server/ml-trade-signal-engine.ts(3249,26): error TS7053: Element implicitly has an 'any' type because expression of type '2' can't be used to index type 'Promise<number[]>'.
+  Property '2' does not exist on type 'Promise<number[]>'.
+server/ml-trade-signal-engine.ts(3250,22): error TS7053: Element implicitly has an 'any' type because expression of type '3' can't be used to index type 'Promise<number[]>'.
+  Property '3' does not exist on type 'Promise<number[]>'.
+server/ml-trade-signal-engine.ts(3292,17): error TS2393: Duplicate function implementation.
+server/ml-trade-signal-engine.ts(3305,37): error TS2554: Expected 2 arguments, but got 1.
+server/ml-trade-signal-engine.ts(3488,13): error TS7034: Variable 'weightAdjustments' implicitly has type 'any[]' in some locations where its type cannot be determined.
+server/ml-trade-signal-engine.ts(3532,108): error TS2365: Operator '>' cannot be applied to types 'string' and 'number'.
+server/ml-trade-signal-engine.ts(3539,7): error TS7005: Variable 'weightAdjustments' implicitly has an 'any[]' type.
+server/ml-trade-signal-engine.ts(3623,27): error TS2551: Property 'generateSignalWithTPSL' does not exist on type 'MLTradeSignalEngine'. Did you mean 'generateTradeSignalWithTPSL'?
+server/ml-trade-signal-engine.ts(3630,37): error TS2551: Property 'generateSignalWithTPSL' does not exist on type 'MLTradeSignalEngine'. Did you mean 'generateTradeSignalWithTPSL'?
+server/ml-trade-signal-engine.ts(3633,51): error TS2339: Property 'generateMultiHorizonForecast' does not exist on type 'MLForecastEngine'.
+server/ml-trade-signal-engine.ts(3652,40): error TS2339: Property 'updateHorizonPerformance' does not exist on type 'MultiHorizonLearningEngine'.
+server/ml-trade-signal-engine.ts(3672,25): error TS2551: Property 'generateSignalWithTPSL' does not exist on type 'MLTradeSignalEngine'. Did you mean 'generateTradeSignalWithTPSL'?
+server/moderate-backfill-service.ts(82,47): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/moderate-backfill-service.ts(105,40): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/moderate-backfill-service.ts(160,9): error TS2353: Object literal may only specify known properties, and 'volatility' does not exist in type '{ symbol: string; timestamp?: unknown; open?: unknown; high?: unknown; low?: unknown; close?: unknown; volume?: unknown; fundingRate?: unknown; nextFundingTime?: unknown; openInterest?: unknown; openInterestChange?: unknown; tradeCount?: unknown; buyVolume?: unknown; sellVolume?: unknown; avgTradeSize?: unknown; lar...'.
+server/recovery-service.ts(533,5): error TS2322: Type 'void' is not assignable to type 'boolean'.
+server/replit-server.ts(8,34): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'.
+server/rolling-chart-service.ts(668,77): error TS2345: Argument of type '{ open: number; high: number; low: number; close: number; volume: number; timestamp: Date; }[]' is not assignable to parameter of type 'OHLCData[]'.
+  Type '{ open: number; high: number; low: number; close: number; volume: number; timestamp: Date; }' is not assignable to type 'OHLCData'.
+    Types of property 'timestamp' are incompatible.
+      Type 'Date' is not assignable to type 'string'.
+server/rolling-chart-service.ts(1131,58): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/routes.ts(59,38): error TS1378: Top-level 'await' expressions are only allowed when the 'module' option is set to 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', 'nodenext', or 'preserve', and the 'target' option is set to 'es2017' or higher.
+server/routes.ts(121,46): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(123,24): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/routes.ts(123,29): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(145,25): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+server/routes.ts(210,47): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(481,43): error TS7006: Parameter 'row' implicitly has an 'any' type.
+server/routes.ts(840,43): error TS2339: Property 'initializeForecastTracking' does not exist on type 'EnhancedForecastLearner'.
+server/routes.ts(867,78): error TS18046: 'error' is of type 'unknown'.
+server/routes.ts(898,78): error TS18046: 'error' is of type 'unknown'.
+server/routes.ts(964,32): error TS2304: Cannot find name 'adaptiveLearning'.
+server/routes.ts(975,27): error TS2304: Cannot find name 'adaptiveLearning'.
+server/routes.ts(985,13): error TS2304: Cannot find name 'adaptiveLearning'.
+server/routes.ts(996,30): error TS2304: Cannot find name 'adaptiveLearning'.
+server/routes.ts(1092,59): error TS2341: Property 'getSymbolQualityMetrics' is private and only accessible within class 'EnhancedChartIngestionService'.
+server/routes.ts(1145,28): error TS2339: Property 'volatility' does not exist on type '{ symbol: string; id: number; createdAt: Date; updatedAt: Date; timestamp: Date; open: string; high: string; low: string; close: string; volume: string; fundingRate: string | null; ... 34 more ...; source: string; }'.
+server/routes.ts(1181,36): error TS2304: Cannot find name 'mlForecastEngine'.
+server/routes.ts(1311,50): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(1312,50): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(1313,52): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(1325,63): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(1330,40): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(1359,60): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(1392,40): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(1423,56): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(1424,56): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(1425,64): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(1426,59): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(1427,58): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(1442,18): error TS18046: 'error' is of type 'unknown'.
+server/routes.ts(1867,50): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(1868,51): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(1869,49): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(1877,17): error TS2339: Property 'calculateDynamicSuccessRate' does not exist on type 'typeof import("C:/Users/RadDo/Crypto-Futures/server/enhanced-signal-engine")'.
+server/routes.ts(2147,53): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(2174,51): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(2202,60): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(2226,42): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(2227,42): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(2228,44): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(2229,46): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(2230,49): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(2231,49): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(2365,56): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(2374,52): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(2429,77): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(2745,48): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/routes.ts(2769,36): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(2964,68): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(3294,38): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(3457,50): error TS2339: Property 'successRate' does not exist on type '50'.
+server/routes.ts(3581,52): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(3589,52): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/routes.ts(3589,57): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(3598,43): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(3601,51): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(3780,27): error TS2339: Property 'toggleExperimentation' does not exist on type 'MLTradeSignalEngine'.
+server/routes.ts(3798,33): error TS2339: Property 'forceExperimentationCycle' does not exist on type 'MLTradeSignalEngine'.
+server/routes.ts(3815,43): error TS2339: Property 'getExperimentationResults' does not exist on type 'MLTradeSignalEngine'.
+server/routes.ts(3866,54): error TS7006: Parameter 'p' implicitly has an 'any' type.
+server/routes.ts(3867,60): error TS7006: Parameter 'p' implicitly has an 'any' type.
+server/routes.ts(3869,54): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/routes.ts(3869,59): error TS7006: Parameter 'val' implicitly has an 'any' type.
+server/routes.ts(3870,66): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/routes.ts(3870,71): error TS7006: Parameter 'val' implicitly has an 'any' type.
+server/routes.ts(3872,59): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/routes.ts(3872,64): error TS7006: Parameter 'val' implicitly has an 'any' type.
+server/routes.ts(3873,71): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/routes.ts(3873,76): error TS7006: Parameter 'val' implicitly has an 'any' type.
+server/routes.ts(3881,54): error TS7006: Parameter 'p' implicitly has an 'any' type.
+server/routes.ts(3900,60): error TS7006: Parameter 'p' implicitly has an 'any' type.
+server/routes.ts(3943,34): error TS2304: Cannot find name 'mlTradeSignalEngine'.
+server/routes.ts(4020,11): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+server/routes.ts(4025,11): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+server/routes.ts(4141,42): error TS2339: Property 'getEngineStatus' does not exist on type 'SelfImprovingMLEngine'.
+server/routes.ts(4176,48): error TS2339: Property 'generateSignal' does not exist on type 'SelfImprovingMLEngine'.
+server/routes.ts(4192,48): error TS2339: Property 'getFeatureLearningStats' does not exist on type 'SelfImprovingMLEngine'.
+server/routes.ts(4207,48): error TS2339: Property 'processCompletedTrades' does not exist on type 'SelfImprovingMLEngine'.
+server/routes.ts(4226,54): error TS2554: Expected 2 arguments, but got 1.
+server/routes.ts(4244,57): error TS2339: Property 'calculateAdaptiveConsensus' does not exist on type 'UltraAccurateTradeSignalEngine'.
+server/routes.ts(4262,62): error TS2339: Property 'applyAdvancedFiltering' does not exist on type 'UltraAccurateTradeSignalEngine'.
+server/routes.ts(4286,39): error TS2339: Property 'direction' does not exist on type 'PgTableWithColumns<{ name: "trade_simulations"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "trade_simulations"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 44 more .....'.
+server/routes.ts(4288,39): error TS2339: Property 'exitPrice' does not exist on type 'PgTableWithColumns<{ name: "trade_simulations"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "trade_simulations"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 44 more .....'.
+server/routes.ts(4289,38): error TS2339: Property 'stopLoss' does not exist on type 'PgTableWithColumns<{ name: "trade_simulations"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "trade_simulations"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 44 more .....'.
+server/routes.ts(4290,40): error TS2339: Property 'takeProfit' does not exist on type 'PgTableWithColumns<{ name: "trade_simulations"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "trade_simulations"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 44 more .....'.
+server/routes.ts(4293,47): error TS2339: Property 'profitLossPercent' does not exist on type 'PgTableWithColumns<{ name: "trade_simulations"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "trade_simulations"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 44 more .....'.
+server/routes.ts(4295,49): error TS2339: Property 'maxAdverseExcursion' does not exist on type 'PgTableWithColumns<{ name: "trade_simulations"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "trade_simulations"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 44 more .....'.
+server/routes.ts(4314,49): error TS2339: Property 'direction' does not exist on type 'PgTableWithColumns<{ name: "trade_simulations"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "trade_simulations"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 44 more .....'.
+server/routes.ts(4321,43): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(4322,42): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(4334,28): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(4390,51): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(4451,41): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(4489,53): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(4510,57): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(4514,35): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/routes.ts(4514,40): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(4516,59): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(4517,57): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(4527,46): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/routes.ts(4527,51): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(4585,13): error TS2339: Property 'tradeCompletionMonitor' does not exist on type 'typeof import("C:/Users/RadDo/Crypto-Futures/server/trade-completion-monitor")'.
+server/routes.ts(4755,15): error TS2339: Property 'tradeCompletionMonitor' does not exist on type 'typeof import("C:/Users/RadDo/Crypto-Futures/server/trade-completion-monitor")'.
+server/routes.ts(4863,56): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(4865,28): error TS2576: Property 'shouldDeleteTrade' does not exist on type 'DataCleanupService'. Did you mean to access the static member 'DataCleanupService.shouldDeleteTrade' instead?
+server/routes.ts(4868,52): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(4928,68): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/routes.ts(5073,16): error TS18046: 'error' is of type 'unknown'.
+server/routes.ts(5092,47): error TS2339: Property 'currentPrice' does not exist on type 'PgTableWithColumns<{ name: "cryptocurrencies"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "cryptocurrencies"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 7 more ...; ...'.
+server/routes.ts(5169,29): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+server/routes.ts(5170,30): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+server/routes.ts(5171,29): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+server/routes.ts(5178,34): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+server/routes.ts(5179,37): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+server/routes.ts(5181,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+server/routes.ts(5182,32): error TS2339: Property 'volatility' does not exist on type '{ symbol: string; id: number; createdAt: Date; updatedAt: Date; timestamp: Date; open: string; high: string; low: string; close: string; volume: string; fundingRate: string | null; ... 34 more ...; source: string; }'.
+server/routes.ts(5183,35): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+server/routes.ts(5217,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+server/routes.ts(5451,33): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '(req: Request, res: Response) => Promise<void>' is not assignable to parameter of type 'Application<Record<string, any>>'.
+      Type '(req: Request, res: Response) => Promise<void>' is missing the following properties from type 'Application<Record<string, any>>': init, defaultConfiguration, engine, set, and 63 more.
+server/routes.ts(5468,16): error TS2554: Expected 0 arguments, but got 1.
+server/routes.ts(5475,11): error TS2349: This expression is not callable.
+  Type 'Number' has no call signatures.
+server/routes.ts(5483,42): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '(req: Request, res: Response) => Promise<void>' is not assignable to parameter of type 'Application<Record<string, any>>'.
+      Type '(req: Request, res: Response) => Promise<void>' is missing the following properties from type 'Application<Record<string, any>>': init, defaultConfiguration, engine, set, and 63 more.
+server/routes.ts(5488,16): error TS2554: Expected 0 arguments, but got 1.
+server/routes.ts(5493,11): error TS2349: This expression is not callable.
+  Type 'Number' has no call signatures.
+server/routes.ts(5696,55): error TS7006: Parameter 'record' implicitly has an 'any' type.
+server/routes.ts(5753,92): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(5804,54): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(5805,53): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(5806,53): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(5813,33): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/routes.ts(5813,38): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(5815,32): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/routes.ts(5815,37): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(5817,45): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(5819,45): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/routes.ts(6139,15): error TS2304: Cannot find name 'orderbookData'.
+server/routes.ts(6140,19): error TS2304: Cannot find name 'orderbookData'.
+server/routes.ts(6141,23): error TS2304: Cannot find name 'orderbookData'.
+server/routes.ts(6168,15): error TS2304: Cannot find name 'tradeTicks'.
+server/routes.ts(6169,19): error TS2304: Cannot find name 'tradeTicks'.
+server/routes.ts(6170,23): error TS2304: Cannot find name 'tradeTicks'.
+server/routes.ts(6356,32): error TS2339: Property 'getValidationStatus' does not exist on type 'ComprehensiveDataValidator'.
+server/routes/continuous-learning.ts(24,12): error TS2339: Property 'logApiRequest' does not exist on type 'LoggingService'.
+server/routes/continuous-learning.ts(208,12): error TS7006: Parameter 'evaluation' implicitly has an 'any' type.
+server/routes/continuous-learning.ts(219,25): error TS18046: 'prod' is of type 'unknown'.
+server/routes/forecasts.ts(3,16): error TS7016: Could not find a declaration file for module 'ws'. 'C:/Users/RadDo/Crypto-Futures/node_modules/ws/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/ws` if it exists or add a new declaration (.d.ts) file containing `declare module 'ws';`
+server/rsi-worker-service.ts(83,15): error TS2304: Cannot find name 'between'.
+server/rsi-worker-service.ts(119,35): error TS7006: Parameter 'p' implicitly has an 'any' type.
+server/safe-technical-indicators.ts(277,21): error TS18047: 'indicators.macd.value' is possibly 'null'.
+server/safe-technical-indicators.ts(279,34): error TS18047: 'indicators.macd.value' is possibly 'null'.
+server/safe-technical-indicators.ts(288,21): error TS18047: 'indicators.stochastic.value' is possibly 'null'.
+server/safe-technical-indicators.ts(290,43): error TS18047: 'indicators.stochastic.value' is possibly 'null'.
+server/safe-technical-indicators.ts(311,25): error TS18047: 'indicators.bollinger.value' is possibly 'null'.
+server/safe-technical-indicators.ts(311,60): error TS18047: 'indicators.bollinger.value' is possibly 'null'.
+server/safe-technical-indicators.ts(312,56): error TS18047: 'indicators.bollinger.value' is possibly 'null'.
+server/self-improving-ml-engine.ts(209,18): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ rsi_overbought_macd_bullish: string; rsi_oversold_stoch_oversold: string; bollinger_squeeze_low_vol: string; macd_crossover_rsi_divergence: string; rsi_mid_macd_strong: string; stoch_oversold_support: string; volatility_spike_momentum: string; bollinger_breakout_rsi: string; }'.
+  No index signature with a parameter of type 'string' was found on type '{ rsi_overbought_macd_bullish: string; rsi_oversold_stoch_oversold: string; bollinger_squeeze_low_vol: string; macd_crossover_rsi_divergence: string; rsi_mid_macd_strong: string; stoch_oversold_support: string; volatility_spike_momentum: string; bollinger_breakout_rsi: string; }'.
+server/self-improving-ml-engine.ts(441,46): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/self-improving-ml-engine.ts(630,55): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/storage.ts(2,3): error TS2305: Module '"@shared/schema"' has no exported member 'users'.
+server/storage.ts(7,8): error TS2305: Module '"@shared/schema"' has no exported member 'User'.
+server/storage.ts(8,8): error TS2305: Module '"@shared/schema"' has no exported member 'InsertUser'.
+server/storage.ts(116,48): error TS2345: Argument of type '{ lastUpdated: Date; symbol: string; name: string; price?: unknown; marketCap?: unknown; volume24h?: unknown; change24h?: unknown; logoUrl?: string | null | undefined; id: number; }' is not assignable to parameter of type '{ symbol: string; id: number; name: string; price: string; marketCap: string; volume24h: string; change24h: string; logoUrl: string | null; lastUpdated: Date; }'.
+  Types of property 'price' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+server/storage.ts(148,39): error TS2345: Argument of type '{ createdAt: Date; updatedAt: Date; symbol: string; userId?: unknown; amount?: unknown; averagePrice?: unknown; id: number; }' is not assignable to parameter of type '{ symbol: string; id: number; userId: number; amount: string; averagePrice: string; createdAt: Date; updatedAt: Date; }'.
+  Types of property 'userId' are incompatible.
+    Type 'unknown' is not assignable to type 'number'.
+server/storage.ts(186,33): error TS2345: Argument of type '{ createdAt: Date; symbol: string; type: string; price?: unknown; userId?: unknown; amount?: unknown; total?: unknown; id: number; }' is not assignable to parameter of type '{ symbol: string; id: number; price: string; userId: number; amount: string; createdAt: Date; type: string; total: string; }'.
+  Types of property 'price' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+server/storage.ts(223,33): error TS2345: Argument of type '{ createdAt: Date; symbol: string; type: string; message: string; userId?: unknown; targetValue?: unknown; isActive?: unknown; id: number; }' is not assignable to parameter of type '{ symbol: string; id: number; userId: number; createdAt: Date; type: string; targetValue: string; isActive: boolean; message: string; }'.
+  Types of property 'userId' are incompatible.
+    Type 'unknown' is not assignable to type 'number'.
+server/storage.ts(261,39): error TS2345: Argument of type '{ lastUpdated: Date; symbol: string; name: string; price: unknown; marketCap: unknown; volume24h: unknown; change24h: unknown; logoUrl: string | null; id: number; }' is not assignable to parameter of type '{ symbol: string; id: number; name: string; price: string; marketCap: string; volume24h: string; change24h: string; logoUrl: string | null; lastUpdated: Date; }'.
+  Types of property 'price' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+server/storage.ts(262,5): error TS2322: Type '{ lastUpdated: Date; symbol: string; name: string; price: unknown; marketCap: unknown; volume24h: unknown; change24h: unknown; logoUrl: string | null; id: number; }' is not assignable to type '{ symbol: string; id: number; name: string; price: string; marketCap: string; volume24h: string; change24h: string; logoUrl: string | null; lastUpdated: Date; }'.
+  Types of property 'price' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+server/storage.ts(267,11): error TS2322: Type '{ lastUpdated: Date; symbol: string; name: string; price?: unknown; marketCap?: unknown; volume24h?: unknown; change24h?: unknown; logoUrl?: string | null | undefined; id: number; }' is not assignable to type '{ symbol: string; id: number; name: string; price: string; marketCap: string; volume24h: string; change24h: string; logoUrl: string | null; lastUpdated: Date; }'.
+  Types of property 'price' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+server/storage.ts(323,37): error TS2345: Argument of type '{ updatedAt: Date; symbol: string; userId: unknown; amount: unknown; averagePrice: unknown; id: number; createdAt: Date; }' is not assignable to parameter of type '{ symbol: string; id: number; userId: number; amount: string; averagePrice: string; createdAt: Date; updatedAt: Date; }'.
+  Types of property 'userId' are incompatible.
+    Type 'unknown' is not assignable to type 'number'.
+server/storage.ts(324,5): error TS2322: Type '{ updatedAt: Date; symbol: string; userId: unknown; amount: unknown; averagePrice: unknown; id: number; createdAt: Date; }' is not assignable to type '{ symbol: string; id: number; userId: number; amount: string; averagePrice: string; createdAt: Date; updatedAt: Date; }'.
+  Types of property 'userId' are incompatible.
+    Type 'unknown' is not assignable to type 'number'.
+server/storage.ts(336,11): error TS2322: Type '{ createdAt: Date; symbol: string; type: string; price?: unknown; userId?: unknown; amount?: unknown; total?: unknown; id: number; }' is not assignable to type '{ symbol: string; id: number; price: string; userId: number; amount: string; createdAt: Date; type: string; total: string; }'.
+  Types of property 'price' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+server/storage.ts(353,11): error TS2322: Type '{ createdAt: Date; symbol: string; type: string; message: string; userId?: unknown; targetValue?: unknown; isActive?: unknown; id: number; }' is not assignable to type '{ symbol: string; id: number; userId: number; createdAt: Date; type: string; targetValue: string; isActive: boolean; message: string; }'.
+  Types of property 'userId' are incompatible.
+    Type 'unknown' is not assignable to type 'number'.
+server/success-score-predictor.ts(349,41): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/success-score-predictor.ts(350,46): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/success-score-predictor.ts(350,51): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/success-score-predictor.ts(351,40): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/success-score-predictor.ts(351,45): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/success-score-predictor.ts(352,46): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+server/success-score-predictor.ts(352,51): error TS7006: Parameter 't' implicitly has an 'any' type.
+server/test-learning-feedback.ts(8,15): error TS2724: '"@shared/schema"' has no exported member named 'InsertForecastPerformance'. Did you mean 'InsertForecastPerformanceData'?
+server/trade-completion-worker.ts(188,39): error TS2339: Property 'processCompletedTrade' does not exist on type 'EnhancedForecastLearner'.
+server/trade-suggestion-engine.ts(388,55): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/trade-suggestion-engine.ts(448,52): error TS7006: Parameter 'trade' implicitly has an 'any' type.
+server/trade-suggestion-engine.ts(980,37): error TS7006: Parameter 'd' implicitly has an 'any' type.
+server/ultra-accurate-trade-signal-engine.ts(896,23): error TS7006: Parameter 'row' implicitly has an 'any' type.
+server/vite.ts(49,9): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'.
+server/vite.ts(71,33): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'.
+server/volatility-backfill-service.ts(73,50): error TS7006: Parameter 'r' implicitly has an 'any' type.
+vite.config.ts(10,25): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'.
+vite.config.ts(11,31): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'.
+vite.config.ts(12,31): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'.
+vite.config.ts(15,22): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'.
+vite.config.ts(17,26): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'.

@@ -1,0 +1,1 @@
+const fs=require('fs');const path=require('path');function walk(dir){fs.readdirSync(dir).forEach(f= fp=path.join(dir,f);if(fs.statSync(fp).isDirectory())walk(fp);else if(fp.endsWith('.ts')){const s=fs.readFileSync(fp,'utf8');if(/\bawait\b/.test(s)

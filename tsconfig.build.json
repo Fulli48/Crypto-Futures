@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./dist/server",
+    "allowImportingTsExtensions": false,
+    "module": "CommonJS",
+    "target": "ES2022",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "allowJs": false,
+    "declaration": false
+  },
+  "include": ["server/**/*", "scripts/**/*", "shared/**/*"]
+  ,
+  "exclude": ["**/*-backup.ts","node_modules","client","dist"]
+}

@@ -1,0 +1,73 @@
+server/index-backup.ts(166,11): error TS1434: Unexpected keyword or identifier.
+server/index-backup.ts(166,25): error TS1005: ';' expected.
+server/index-backup.ts(166,28): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+server/index-backup.ts(166,46): error TS1005: ';' expected.
+server/index-backup.ts(166,49): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+server/index-backup.ts(167,11): error TS1128: Declaration or statement expected.
+server/index-backup.ts(167,12): error TS1434: Unexpected keyword or identifier.
+server/index-backup.ts(167,33): error TS1127: Invalid character.
+server/index-backup.ts(167,34): error TS1005: ';' expected.
+server/index-backup.ts(167,35): error TS1005: ';' expected.
+server/index-backup.ts(167,35): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+server/index-backup.ts(167,54): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+server/index-backup.ts(167,68): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+server/index-backup.ts(167,71): error TS1434: Unexpected keyword or identifier.
+server/index-backup.ts(167,77): error TS1127: Invalid character.
+server/index-backup.ts(167,78): error TS1121: Octal literals are not allowed. Use the syntax '0o0'.
+server/index-backup.ts(167,80): error TS1005: ';' expected.
+server/index-backup.ts(167,99): error TS1005: ';' expected.
+server/index-backup.ts(167,102): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+server/index-backup.ts(167,115): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+server/index-backup.ts(168,11): error TS1128: Declaration or statement expected.
+server/index-backup.ts(168,12): error TS1434: Unexpected keyword or identifier.
+server/index-backup.ts(168,33): error TS1434: Unexpected keyword or identifier.
+server/index-backup.ts(168,40): error TS1005: ';' expected.
+server/index-backup.ts(168,40): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+server/index-backup.ts(169,21): error TS1146: Declaration expected.
+server/index-backup.ts(169,22): error TS1434: Unexpected keyword or identifier.
+server/index-backup.ts(169,32): error TS1109: Expression expected.
+server/index-backup.ts(169,51): error TS1005: ',' expected.
+server/index-backup.ts(169,55): error TS1005: ';' expected.
+server/index-backup.ts(169,73): error TS1005: ',' expected.
+server/index-backup.ts(170,10): error TS1110: Type expected.
+server/index-backup.ts(171,8): error TS1161: Unterminated regular expression literal.
+server/index-backup.ts(173,14): error TS1005: '>' expected.
+server/index-backup.ts(173,19): error TS1005: '{' expected.
+server/index-backup.ts(174,15): error TS1127: Invalid character.
+server/index-backup.ts(174,18): error TS1434: Unexpected keyword or identifier.
+server/index-backup.ts(174,35): error TS1161: Unterminated regular expression literal.
+server/index-backup.ts(175,16): error TS1005: ';' expected.
+server/index-backup.ts(175,21): error TS1005: '{' expected.
+server/index-backup.ts(176,31): error TS1005: ';' expected.
+server/index-backup.ts(176,39): error TS1110: Type expected.
+server/index-backup.ts(177,35): error TS1005: ';' expected.
+server/index-backup.ts(177,37): error TS1110: Type expected.
+server/index-backup.ts(178,28): error TS1005: ';' expected.
+server/index-backup.ts(178,30): error TS1110: Type expected.
+server/index-backup.ts(179,12): error TS1110: Type expected.
+server/index-backup.ts(180,16): error TS1005: ';' expected.
+server/index-backup.ts(180,21): error TS1005: '{' expected.
+server/index-backup.ts(181,16): error TS1005: '>' expected.
+server/index-backup.ts(181,21): error TS1005: '{' expected.
+server/index-backup.ts(181,40): error TS1005: ';' expected.
+server/index-backup.ts(181,50): error TS1005: ';' expected.
+server/index-backup.ts(181,57): error TS1434: Unexpected keyword or identifier.
+server/index-backup.ts(181,61): error TS1128: Declaration or statement expected.
+server/index-backup.ts(181,65): error TS1110: Type expected.
+server/index-backup.ts(182,18): error TS1005: ';' expected.
+server/index-backup.ts(182,36): error TS1110: Type expected.
+server/index-backup.ts(183,12): error TS1161: Unterminated regular expression literal.
+server/index-backup.ts(184,10): error TS1161: Unterminated regular expression literal.
+server/index-backup.ts(198,10): error TS1110: Type expected.
+server/index-backup.ts(199,8): error TS1161: Unterminated regular expression literal.
+server/index-backup.ts(200,8): error TS1161: Unterminated regular expression literal.
+server/index-backup.ts(219,10): error TS1005: ';' expected.
+server/index-backup.ts(219,18): error TS1434: Unexpected keyword or identifier.
+server/index-backup.ts(219,21): error TS1434: Unexpected keyword or identifier.
+server/index-backup.ts(219,26): error TS1434: Unexpected keyword or identifier.
+server/index-backup.ts(220,10): error TS1005: ';' expected.
+server/index-backup.ts(220,18): error TS1434: Unexpected keyword or identifier.
+server/index-backup.ts(221,3): error TS1109: Expression expected.
+server/index-backup.ts(222,1): error TS1128: Declaration or statement expected.
+server/index-backup.ts(222,2): error TS1128: Declaration or statement expected.
+server/index-backup.ts(222,4): error TS1109: Expression expected.

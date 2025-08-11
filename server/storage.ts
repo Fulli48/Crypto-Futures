@@ -360,4 +360,8 @@ export class MemStorage implements IStorage {
   }
 }
 
+// Re-export database handle from central db module so modules that import
+// `db` from './storage' (legacy) continue to work when bundling.
+export { db } from './db';
+
 export const storage = new MemStorage();
