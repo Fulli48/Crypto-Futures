@@ -1257,12 +1257,10 @@ function BinanceDashboard() {
               return null;
             })()}
           </CardContent>
-        </Card>
+    
         )}
 
-
-            </div>
-          </CardContent>
+          
         </Card>
 
         {/* Live Learning System */}
