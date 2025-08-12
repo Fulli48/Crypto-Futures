@@ -3,7 +3,8 @@ import { liveChartData, liveMLSignals, rollingChartData } from '../shared/schema
 import { eq, desc, gte, sql } from 'drizzle-orm';
 import { MLTradeSignalEngine } from './ml-trade-signal-engine';
 import { realPriceAPI } from './real-price-api';
-import { classifySignalQuality } from '../client/src/utils/signal-quality-classifier';
+import SQ from '../client/src/utils/signal-quality-classifier.ts';
+const { classifySignalQuality } = (SQ as any);
 import { rollingChartService } from './rolling-chart-service';
 
 

@@ -1,3 +1,11 @@
+// --- injected shim: disable Vite in dev to avoid crashes ---
+declare var setupVite: any;
+if (typeof (globalThis as any).setupVite === 'undefined') {
+  (globalThis as any).setupVite = async function setupVite() {
+    return { middleware: (_req:any,_res:any,next:any)=> next && next() };
+  };
+}
+// --- end shim ---
 import express, { type Request, Response, NextFunction } from "express";
 // Routes are imported dynamically below. The full `routes` module performs
 // heavy initialization (ML engines, background workers) and will be skipped
@@ -310,3 +318,4 @@ app.use((req, res, next) => {
     log(`preview available at: https://${process.env.REPL_SLUG || 'app'}.${process.env.REPL_OWNER || 'user'}.replit.dev/`);
   });
 })();
+
