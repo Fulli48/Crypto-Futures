@@ -1,18 +1,28 @@
-{
-  "dependencies": {
-    "crypto-futures": "file:..",
-    "sonner": "^2.0.7"
-  },
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.17",
-    "tailwindcss-animate": "^1.0.7",
-    "vite-tsconfig-paths": "^5.1.4"
-  }
+﻿{
+    "dependencies":  {
+                         "crypto-futures":  "file:..",
+                         "sonner":  "^2.0.7"
+                     },
+    "scripts":  {
+                    "dev":  "vite",
+                    "build":  "vite build",
+                    "preview":  "vite preview"
+                },
+    "devDependencies":  {
+                            "vite-tsconfig-paths":  "^5.1.4",
+                            "eslint":  "^9.0.0",
+                            "eslint-plugin-react-hooks":  "^4.6.0",
+                            "tsx":  "^4.7.0",
+                            "eslint-plugin-react":  "^7.34.0",
+                            "@typescript-eslint/eslint-plugin":  "^7.0.0",
+                            "tailwindcss":  "^3.4.17",
+                            "typescript":  "^5.4.0",
+                            "@typescript-eslint/parser":  "^7.0.0",
+                            "tailwindcss-animate":  "^1.0.7",
+                            "postcss":  "^8.5.6",
+                            "autoprefixer":  "^10.4.21",
+                            "eslint-plugin-import":  "^2.29.0",
+                            "eslint-config-prettier":  "^9.0.0",
+                            "prettier":  "^3.2.0"
+                        }
 }
