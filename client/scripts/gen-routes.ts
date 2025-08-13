@@ -1,4 +1,4 @@
-﻿import fs from "fs";
+import fs from "fs";
 import path from "path";
 
 const PAGES_DIR = path.resolve(__dirname, "..", "src", "pages");
@@ -30,7 +30,7 @@ function importName(p: string): string {
   return "Pg_" + rel.replace(/_tsx$/, "");
 }
 
-const files = walk(PAGES_DIR).filter(hasDefaultExport).sort((a,b)=>a.localeCompare(b));
+const files = walk(PAGES_DIR).filter(f => !/-broken\.tsx$/.test(f)).filter(hasDefaultExport).sort((a,b)=>a.localeCompare(b));
 const imports: string[] = [];
 const routes: string[] = [];
 for (const f of files) {

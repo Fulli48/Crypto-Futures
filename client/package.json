@@ -1,4 +1,4 @@
-﻿{
+{
     "dependencies":  {
                          "crypto-futures":  "file:..",
                          "sonner":  "^2.0.7"
@@ -31,5 +31,7 @@
                             "eslint-plugin-import":  "2.29.1",
                             "eslint-config-prettier":  "9.1.0",
                             "prettier":  "3.3.3"
-                        }
+                        },
+    "name":  "client",
+    "version":  "0.0.0"
 }

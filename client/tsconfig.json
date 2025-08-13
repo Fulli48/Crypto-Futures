@@ -1,4 +1,4 @@
-﻿{
+{
     "compilerOptions":  {
                             "target":  "ES2020",
                             "lib":  [
@@ -18,5 +18,9 @@
                         },
     "include":  [
                     "src"
+                ],
+    "exclude":  [
+                    "src/pages/binance-dashboard-broken.tsx",
+                    "src/pages/*-broken.tsx"
                 ]
 }
